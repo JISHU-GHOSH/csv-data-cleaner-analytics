@@ -1,0 +1,21 @@
+ Transaction_ID , Date , Customer_Name , Region , Units_Sold , Unit_Price , Total_Revenue 
+TXN1001,2026-01-05, Acme Corp , North ,10,250.0,2500.0
+TXN1002,2026-01-06,Beta Solutions, South ,5,120.0,600.0
+TXN1003,2026-01-07,Gamma Enterprises,,12,45.0,540.0
+TXN1004,2026-01-08,Delta Retail, East ,8,,720.0
+TXN1005,2026-01-09,Epsilon Tech, West ,15,300.0,4500.0
+TXN1005,2026-01-09,Epsilon Tech, West ,15,300.0,4500.0
+TXN1006,2026-01-10,Zeta Logistics, North ,,80.0,
+TXN1007,2026-01-11,  Eta Consulting , South ,4,500.0,2000.0
+TXN1008,2026-01-12,Theta Goods,,20,15.0,300.0
+TXN1009,2026-01-13,Iota Systems, West ,7,350.0,2450.0
+TXN1001,2026-01-05, Acme Corp , North ,10,250.0,2500.0
+TXN1010,2026-01-14,Kappa Industries, East ,14,90.0,1260.0
+TXN1011,2026-01-15,Lambda Ventures, North ,6,,900.0
+TXN1012,2026-01-16,Mu Stores, South ,9,110.0,990.0
+TXN1013,2026-01-17,Nu Global, West ,11,210.0,
+TXN1014,2026-01-18,Xi Supplies, East ,18,30.0,540.0
+TXN1015,2026-01-19,Omicron Brands, North ,3,400.0,1200.0
+TXN1016,2026-01-20,Pi Dynamics, South ,25,50.0,1250.0
+TXN1002,2026-01-06,Beta Solutions, South ,5,120.0,600.0
+TXN1017,2026-01-21,Rho Tech, West ,8,180.0,1440.0
