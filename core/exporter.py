@@ -1,15 +1,8 @@
-"""Exporter module.
-
-Handles safe writing of cleaned datasets to CSV and audit reports to text files.
-"""
-
-from typing import Tuple
 import os
+from typing import Tuple
 import pandas as pd
 
-
 def save_csv(df: pd.DataFrame, output_path: str) -> Tuple[bool, str]:
-    """Saves a pandas DataFrame to CSV with UTF-8 encoding."""
     try:
         dirname = os.path.dirname(output_path)
         if dirname and not os.path.exists(dirname):
@@ -20,9 +13,7 @@ def save_csv(df: pd.DataFrame, output_path: str) -> Tuple[bool, str]:
     except Exception as e:
         return False, f"Failed to save CSV: {str(e)}"
 
-
 def save_report(report_text: str, output_path: str) -> Tuple[bool, str]:
-    """Writes audit report text to a file."""
     try:
         dirname = os.path.dirname(output_path)
         if dirname and not os.path.exists(dirname):

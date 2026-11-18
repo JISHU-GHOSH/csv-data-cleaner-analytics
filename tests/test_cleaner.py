@@ -9,7 +9,6 @@ from core.cleaner import (
     auto_clean_all,
 )
 
-
 class TestCleaner(unittest.TestCase):
     def setUp(self):
         self.dirty_df = pd.DataFrame({
@@ -26,7 +25,6 @@ class TestCleaner(unittest.TestCase):
         self.assertIn("Standardized", msg)
 
     def test_remove_duplicates(self):
-        # Rows 0 and 2 are duplicates
         clean_df, msg, count = remove_duplicates(self.dirty_df)
         self.assertEqual(count, 1)
         self.assertEqual(len(clean_df), 4)
@@ -40,13 +38,11 @@ class TestCleaner(unittest.TestCase):
     def test_handle_missing_mean(self):
         clean_df, msg = handle_missing(self.dirty_df, column="Age ", strategy="mean")
         self.assertFalse(clean_df["Age "].isna().any())
-        # Mean of [20, 20, 24, 22] = 86 / 4 = 21.5
         self.assertAlmostEqual(clean_df.iloc[1]["Age "], 21.5)
 
     def test_handle_missing_median(self):
         clean_df, msg = handle_missing(self.dirty_df, column="Age ", strategy="median")
         self.assertFalse(clean_df["Age "].isna().any())
-        # Median of [20, 20, 22, 24] = 21.0
         self.assertAlmostEqual(clean_df.iloc[1]["Age "], 21.0)
 
     def test_handle_missing_mode(self):
@@ -68,7 +64,6 @@ class TestCleaner(unittest.TestCase):
         self.assertFalse(clean_df.duplicated().any())
         self.assertEqual(list(clean_df.columns), ["full_name", "age", "score", "department"])
         self.assertGreater(len(log), 0)
-
 
 if __name__ == "__main__":
     unittest.main()

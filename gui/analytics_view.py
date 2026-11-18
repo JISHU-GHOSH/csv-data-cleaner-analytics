@@ -1,9 +1,3 @@
-"""Analytics View module.
-
-Provides a dedicated tab displaying descriptive statistics, five-number
-summaries, categorical frequency breakdowns, and correlation tables.
-"""
-
 from typing import Optional
 import tkinter as tk
 from tkinter import ttk
@@ -14,37 +8,29 @@ from core.stats_engine import (
     get_correlation_matrix,
 )
 
-
 class AnalyticsView(ttk.Frame):
-    """Tab widget for displaying dataset analytics and statistical summaries."""
-
-    def __init__(self, parent: tk.Widget) -> None:
+    def __init__(self, parent: tk.Widget):
         super().__init__(parent)
         self.current_df: Optional[pd.DataFrame] = None
-
         self._build_ui()
 
-    def _build_ui(self) -> None:
-        # Sub-notebook for Analytics categories
+    def _build_ui(self):
         self.notebook = ttk.Notebook(self)
         self.notebook.pack(fill="both", expand=True, padx=5, pady=5)
 
-        # Tab 1: Numeric Summary
         self.num_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.num_frame, text="Numeric Summary (Five-Number)")
         self._build_numeric_tab()
 
-        # Tab 2: Categorical Distribution
         self.cat_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.cat_frame, text="Categorical Frequencies")
         self._build_categorical_tab()
 
-        # Tab 3: Correlation Matrix
         self.corr_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.corr_frame, text="Correlation Matrix")
         self._build_correlation_tab()
 
-    def _build_numeric_tab(self) -> None:
+    def _build_numeric_tab(self):
         self.num_tree = ttk.Treeview(self.num_frame, selectmode="browse", show="headings")
         v_scroll = ttk.Scrollbar(self.num_frame, orient=tk.VERTICAL, command=self.num_tree.yview)
         h_scroll = ttk.Scrollbar(self.num_frame, orient=tk.HORIZONTAL, command=self.num_tree.xview)
@@ -54,8 +40,7 @@ class AnalyticsView(ttk.Frame):
         v_scroll.pack(side="right", fill="y")
         h_scroll.pack(side="bottom", fill="x")
 
-    def _build_categorical_tab(self) -> None:
-        # Top control bar
+    def _build_categorical_tab(self):
         top_bar = ttk.Frame(self.cat_frame)
         top_bar.pack(fill="x", padx=10, pady=8)
 
@@ -69,7 +54,6 @@ class AnalyticsView(ttk.Frame):
         self.cat_combo.pack(side="left", padx=5)
         self.cat_combo.bind("<<ComboboxSelected>>", self._on_cat_col_selected)
 
-        # Treeview for categories
         self.cat_tree = ttk.Treeview(
             self.cat_frame,
             columns=("Category", "Count", "Percentage (%)"),
@@ -86,7 +70,7 @@ class AnalyticsView(ttk.Frame):
         self.cat_tree.pack(side="left", fill="both", expand=True, padx=5, pady=5)
         v_scroll.pack(side="right", fill="y")
 
-    def _build_correlation_tab(self) -> None:
+    def _build_correlation_tab(self):
         self.corr_tree = ttk.Treeview(self.corr_frame, selectmode="browse", show="headings")
         v_scroll = ttk.Scrollbar(self.corr_frame, orient=tk.VERTICAL, command=self.corr_tree.yview)
         h_scroll = ttk.Scrollbar(self.corr_frame, orient=tk.HORIZONTAL, command=self.corr_tree.xview)
@@ -96,29 +80,25 @@ class AnalyticsView(ttk.Frame):
         v_scroll.pack(side="right", fill="y")
         h_scroll.pack(side="bottom", fill="x")
 
-    def update_stats(self, df: pd.DataFrame) -> None:
-        """Refreshes all summary statistics for the updated DataFrame."""
+    def update_stats(self, df: pd.DataFrame):
         self.current_df = df
         if df is None or df.empty:
             self._clear_all()
             return
 
-        # 1. Update Numeric Summary
         num_summary = get_numeric_summary(df)
         self._populate_tree(self.num_tree, num_summary, include_index=True)
 
-        # 2. Update Categorical Column Dropdown
         all_cols = list(df.columns)
         self.cat_combo["values"] = all_cols
         if all_cols:
             self.cat_combo.current(0)
             self._on_cat_col_selected()
 
-        # 3. Update Correlation Matrix
         corr_matrix = get_correlation_matrix(df)
         self._populate_tree(self.corr_tree, corr_matrix, include_index=True)
 
-    def _on_cat_col_selected(self, event=None) -> None:
+    def _on_cat_col_selected(self, event=None):
         col = self.cat_col_var.get()
         if not col or self.current_df is None or col not in self.current_df.columns:
             return
@@ -135,7 +115,7 @@ class AnalyticsView(ttk.Frame):
 
     def _populate_tree(
         self, tree: ttk.Treeview, df: pd.DataFrame, include_index: bool = False
-    ) -> None:
+    ):
         for item in tree.get_children():
             tree.delete(item)
 
@@ -157,7 +137,7 @@ class AnalyticsView(ttk.Frame):
             vals = ([str(idx)] + [str(v) for v in row]) if include_index else [str(v) for v in row]
             tree.insert("", "end", values=vals)
 
-    def _clear_all(self) -> None:
+    def _clear_all(self):
         for tree in (self.num_tree, self.cat_tree, self.corr_tree):
             for item in tree.get_children():
                 tree.delete(item)

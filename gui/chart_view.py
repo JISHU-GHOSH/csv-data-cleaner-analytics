@@ -1,9 +1,3 @@
-"""Chart View module.
-
-Embeds interactive Matplotlib visual charts directly inside a Tkinter tab
-using FigureCanvasTkAgg.
-"""
-
 from typing import Optional
 import tkinter as tk
 from tkinter import ttk, messagebox
@@ -13,22 +7,16 @@ matplotlib.use("TkAgg")
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 
-
 class ChartView(ttk.Frame):
-    """Tab widget for rendering and saving embedded Matplotlib visualizations."""
-
-    def __init__(self, parent: tk.Widget) -> None:
+    def __init__(self, parent: tk.Widget):
         super().__init__(parent)
         self.current_df: Optional[pd.DataFrame] = None
-
         self._build_ui()
 
-    def _build_ui(self) -> None:
-        # Top Control Toolbar
+    def _build_ui(self):
         control_frame = ttk.LabelFrame(self, text=" Visualization Controls ", padding=10)
         control_frame.pack(fill="x", padx=10, pady=5)
 
-        # 1. Column Selection
         ttk.Label(control_frame, text="Select Column:", font=("Segoe UI", 9, "bold")).grid(
             row=0, column=0, padx=5, pady=5, sticky="w"
         )
@@ -38,7 +26,6 @@ class ChartView(ttk.Frame):
         )
         self.col_combo.grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
-        # 2. Plot Type Selection
         ttk.Label(control_frame, text="Chart Type:", font=("Segoe UI", 9, "bold")).grid(
             row=0, column=2, padx=15, pady=5, sticky="w"
         )
@@ -58,7 +45,6 @@ class ChartView(ttk.Frame):
         )
         self.plot_combo.grid(row=0, column=3, padx=5, pady=5, sticky="w")
 
-        # 3. Action Buttons
         ttk.Button(
             control_frame, text="📊 Render Chart", command=self.render_selected_plot
         ).grid(row=0, column=4, padx=10, pady=5)
@@ -67,7 +53,6 @@ class ChartView(ttk.Frame):
             control_frame, text="🧹 Clear Canvas", command=self.clear_canvas
         ).grid(row=0, column=5, padx=5, pady=5)
 
-        # Matplotlib Canvas Area
         self.canvas_frame = ttk.Frame(self)
         self.canvas_frame.pack(fill="both", expand=True, padx=10, pady=5)
 
@@ -81,8 +66,7 @@ class ChartView(ttk.Frame):
 
         self._draw_placeholder()
 
-    def update_columns(self, df: pd.DataFrame) -> None:
-        """Updates available columns dropdown when dataset changes."""
+    def update_columns(self, df: pd.DataFrame):
         self.current_df = df
         if df is None or df.empty:
             self.col_combo["values"] = []
@@ -93,15 +77,13 @@ class ChartView(ttk.Frame):
         columns = list(df.columns)
         self.col_combo["values"] = columns
         if columns:
-            # Default to first numeric column if available
             num_cols = df.select_dtypes(include=["number"]).columns
             if len(num_cols) > 0:
                 self.col_combo.set(num_cols[0])
             else:
                 self.col_combo.set(columns[0])
 
-    def render_selected_plot(self) -> None:
-        """Plots the selected column and chart type."""
+    def render_selected_plot(self):
         if self.current_df is None or self.current_df.empty:
             messagebox.showwarning("No Data", "Please load a dataset first.", parent=self)
             return
@@ -182,11 +164,10 @@ class ChartView(ttk.Frame):
             messagebox.showerror("Plotting Error", f"An error occurred while generating plot:\n{str(e)}", parent=self)
             self._draw_placeholder()
 
-    def clear_canvas(self) -> None:
-        """Clears chart canvas back to placeholder."""
+    def clear_canvas(self):
         self._draw_placeholder()
 
-    def _draw_placeholder(self) -> None:
+    def _draw_placeholder(self):
         self.ax.clear()
         self.ax.text(
             0.5,

@@ -36,7 +36,6 @@ class TestDataManager(unittest.TestCase):
 
     def test_reset_to_raw(self):
         self.dm.load_csv(self.sample_path)
-        # Mutate current_df
         self.dm.current_df = self.dm.current_df.iloc[:5].copy()
         self.assertEqual(len(self.dm.current_df), 5)
         self.dm.reset_to_raw()

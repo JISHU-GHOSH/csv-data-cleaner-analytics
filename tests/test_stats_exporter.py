@@ -11,7 +11,6 @@ from core.stats_engine import (
 from core.audit_logger import AuditLogger
 from core.exporter import save_csv, save_report
 
-
 class TestStatsAndExporter(unittest.TestCase):
     def setUp(self):
         self.test_dir = tempfile.mkdtemp()
@@ -68,7 +67,6 @@ class TestStatsAndExporter(unittest.TestCase):
         with open(out_path, "r", encoding="utf-8") as f:
             content = f.read()
         self.assertEqual(content, "Sample Audit Report Content")
-
 
 if __name__ == "__main__":
     unittest.main()

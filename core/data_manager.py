@@ -1,28 +1,17 @@
-"""Data Manager module.
-
-Manages the lifecycle of datasets, including loading, backup/reset,
-and health metrics calculation.
-"""
-
-from typing import Tuple, Dict, Any, Optional
 import os
+from typing import Tuple, Dict, Any, Optional
 import pandas as pd
 
-
 class DataManager:
-    """Manages active dataset, immutable raw backup, and health metrics."""
-
-    def __init__(self) -> None:
+    def __init__(self):
         self.raw_df: Optional[pd.DataFrame] = None
         self.current_df: Optional[pd.DataFrame] = None
         self.source_name: str = ""
 
     def has_data(self) -> bool:
-        """Returns True if a valid DataFrame is currently loaded."""
         return self.current_df is not None and not self.current_df.empty
 
     def load_csv(self, filepath: str) -> Tuple[bool, str]:
-        """Loads a CSV file from disk with encoding fallback."""
         if not os.path.exists(filepath):
             return False, f"File not found: {filepath}"
 
@@ -46,7 +35,6 @@ class DataManager:
         return False, f"Failed to read CSV: {last_error}"
 
     def load_sample(self, sample_key: str = "students") -> Tuple[bool, str]:
-        """Loads one of the pre-bundled sample datasets."""
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         if sample_key == "sales":
             path = os.path.join(base_dir, "data", "sample_sales_dirty.csv")
@@ -56,7 +44,6 @@ class DataManager:
         return self.load_csv(path)
 
     def reset_to_raw(self) -> Tuple[bool, str]:
-        """Restores the current DataFrame back to the original loaded snapshot."""
         if self.raw_df is None:
             return False, "No original dataset to restore."
 
@@ -64,7 +51,6 @@ class DataManager:
         return True, "Dataset restored to original loaded state."
 
     def get_health_metrics(self) -> Dict[str, Any]:
-        """Calculates comprehensive health indicators for the active dataset."""
         if not self.has_data() or self.current_df is None:
             return {
                 "total_rows": 0,
@@ -84,7 +70,6 @@ class DataManager:
         missing_per_col = df.isna().sum().to_dict()
         total_missing_cells = int(df.isna().sum().sum())
 
-        # Check for unclean headers: leading/trailing whitespace, uppercase, or special chars
         has_unclean_headers = any(
             col != col.strip().lower().replace(" ", "_") for col in df.columns
         )
