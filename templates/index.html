@@ -3,259 +3,167 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSV Data Cleaner & Analytics Studio</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <title>CSV Data Cleaner & Preprocessing Tool</title>
   <link rel="stylesheet" href="/static/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="dark-theme">
-  <!-- Top Glass Navigation -->
-  <header class="navbar">
-    <div class="nav-container">
-      <div class="brand">
-        <div class="brand-badge">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-        </div>
-        <div class="brand-info">
-          <div class="brand-title">DataStudio <span class="version-tag">Pro</span></div>
-          <div class="brand-subtitle">CSV Cleaning & Exploratory Analytics</div>
-        </div>
+<body>
+  <header class="app-header">
+    <div class="header-container">
+      <div class="app-title">
+        <h1>CSV Data Cleaner & Preprocessing Tool</h1>
+        <p>Python Practical Project — Data Inspection, Cleaning & Summary Statistics</p>
       </div>
-
-      <div class="nav-actions">
-        <button class="nav-btn demo-btn" onclick="loadSample('students')">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-          Students Demo
-        </button>
-        <button class="nav-btn demo-btn" onclick="loadSample('sales')">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          Sales Demo
-        </button>
-
-        <div class="nav-divider"></div>
-
-        <label class="nav-btn upload-btn">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Upload CSV
+      <div class="header-actions">
+        <label class="btn btn-primary">
+          Open CSV File
           <input type="file" id="fileInput" accept=".csv" onchange="uploadCSV(event)" hidden>
         </label>
-
-        <button class="nav-btn action-outline" onclick="resetData()" title="Restore original snapshot">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-          Reset
-        </button>
-
-        <button class="nav-btn export-btn" onclick="downloadCleanCSV()">
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Export CSV
-        </button>
+        <button class="btn" onclick="loadSample('students')">Sample: Students</button>
+        <button class="btn" onclick="loadSample('sales')">Sample: Sales</button>
+        <button class="btn btn-danger-outline" onclick="resetData()">Reset to Original</button>
+        <button class="btn btn-success" onclick="downloadCleanCSV()">Download Cleaned CSV</button>
       </div>
     </div>
   </header>
 
-  <div class="app-shell">
-    <!-- Top KPI Cards / Health Indicators -->
-    <section class="kpi-grid">
-      <div class="kpi-card">
-        <div class="kpi-header">
-          <span class="kpi-label">Active Source</span>
-          <span class="kpi-icon">📁</span>
-        </div>
-        <div class="kpi-value truncate" id="fileBadge">No dataset loaded</div>
-        <div class="kpi-sub" id="shapeBadge">0 rows × 0 columns</div>
+  <div class="container">
+    <section class="summary-bar" id="summaryBar">
+      <div class="summary-item">
+        <span class="label">Loaded File</span>
+        <span class="value" id="fileBadge">None</span>
       </div>
-
-      <div class="kpi-card" id="dupCard">
-        <div class="kpi-header">
-          <span class="kpi-label">Duplicate Rows</span>
-          <span class="kpi-icon">👥</span>
-        </div>
-        <div class="kpi-value" id="dupBadge">0</div>
-        <div class="kpi-status-pill clean" id="dupPill">Clean</div>
+      <div class="summary-item">
+        <span class="label">Dimensions</span>
+        <span class="value" id="shapeBadge">0 rows × 0 cols</span>
       </div>
-
-      <div class="kpi-card" id="nullCard">
-        <div class="kpi-header">
-          <span class="kpi-label">Missing Values</span>
-          <span class="kpi-icon">⚠️</span>
-        </div>
-        <div class="kpi-value" id="nullBadge">0</div>
-        <div class="kpi-status-pill clean" id="nullPill">Complete</div>
+      <div class="summary-item">
+        <span class="label">Duplicate Rows</span>
+        <span class="value tag" id="dupBadge">0</span>
       </div>
-
-      <div class="kpi-card" id="headerCard">
-        <div class="kpi-header">
-          <span class="kpi-label">Schema Standard</span>
-          <span class="kpi-icon">🏷️</span>
-        </div>
-        <div class="kpi-value text-sm" id="headerBadge">Standardized</div>
-        <div class="kpi-status-pill clean" id="headerPill">Optimized</div>
+      <div class="summary-item">
+        <span class="label">Missing (NaN) Cells</span>
+        <span class="value tag" id="nullBadge">0</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Header Format</span>
+        <span class="value tag" id="headerBadge">Normal</span>
       </div>
     </section>
 
-    <!-- Cleaning Operations Toolbar -->
-    <section class="operations-bar">
-      <div class="ops-left">
-        <button class="auto-clean-button" onclick="triggerClean('auto_clean')">
-          <span class="sparkle-icon">✨</span>
-          Auto-Clean All
-          <span class="btn-caption">1-Click Fix</span>
-        </button>
-
-        <div class="tool-group">
-          <button class="tool-chip" onclick="triggerClean('standardize_headers')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7V4h16v3M9 20h6M12 4v16"/></svg>
-            Format Headers
-          </button>
-          <button class="tool-chip" onclick="triggerClean('remove_duplicates')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            Deduplicate
-          </button>
-          <button class="tool-chip" onclick="openMissingModal()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-            Impute Missing
-          </button>
-          <button class="tool-chip" onclick="triggerClean('trim_whitespace')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
-            Trim Spaces
-          </button>
-        </div>
-      </div>
-
-      <div class="ops-right">
-        <button class="tool-chip secondary" onclick="downloadReport()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          Audit Report
-        </button>
-      </div>
-    </section>
-
-    <!-- Main Workspace Container -->
-    <main class="studio-card">
-      <nav class="studio-tabs">
-        <button class="studio-tab active" onclick="switchTab('tableTab', this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>
-          Spreadsheet Grid
-        </button>
-        <button class="studio-tab" onclick="switchTab('statsTab', this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          Summary Statistics
-        </button>
-        <button class="studio-tab" onclick="switchTab('chartTab', this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
-          Visual Distributions
-        </button>
-        <button class="studio-tab" onclick="switchTab('auditTab', this)">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-          Changelog & Audit
-        </button>
-      </nav>
-
-      <div class="studio-body">
-        <!-- Tab 1: Table -->
-        <div class="tab-pane active" id="tableTab">
-          <div class="table-frame" id="tableContainer">
-            <div class="empty-dropzone" onclick="document.getElementById('fileInput').click()">
-              <div class="dropzone-icon">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              </div>
-              <h3>Drag and drop your raw CSV file here</h3>
-              <p>or click to browse files from your computer</p>
-              <div class="demo-suggestions">
-                <span>or try:</span>
-                <button type="button" class="chip-link" onclick="event.stopPropagation(); loadSample('students')">🎓 Students Demo</button>
-                <button type="button" class="chip-link" onclick="event.stopPropagation(); loadSample('sales')">💼 Sales Demo</button>
-              </div>
+    <div class="workspace-grid">
+      <div class="left-panel">
+        <div class="panel-box">
+          <h2>Data Cleaning Operations</h2>
+          <div class="cleaning-controls">
+            <button class="btn btn-block btn-accent" onclick="triggerClean('auto_clean')">Auto-Clean All (Recommended)</button>
+            <div class="btn-group">
+              <button class="btn" onclick="triggerClean('standardize_headers')">Standardize Column Names</button>
+              <button class="btn" onclick="triggerClean('remove_duplicates')">Remove Duplicate Rows</button>
+              <button class="btn" onclick="openMissingModal()">Handle Missing Values</button>
+              <button class="btn" onclick="triggerClean('trim_whitespace')">Trim Text Whitespace</button>
             </div>
           </div>
         </div>
 
-        <!-- Tab 2: Statistics -->
-        <div class="tab-pane" id="statsTab">
-          <div class="stats-wrapper" id="statsContainer">
-            <div class="empty-state">Load a dataset to generate statistical metrics.</div>
-          </div>
+        <div class="panel-box project-info">
+          <h3>Project Details</h3>
+          <ul>
+            <li><strong>Frameworks:</strong> Python, Flask, Pandas, NumPy, Chart.js</li>
+            <li><strong>Purpose:</strong> Raw data inspection, handling nulls/duplicates, descriptive analytics</li>
+            <li><strong>Lab Submission:</strong> End-Semester Practical Examination</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="right-panel">
+        <div class="view-tabs">
+          <button class="tab-btn active" onclick="switchTab('tableTab', this)">Data Preview</button>
+          <button class="tab-btn" onclick="switchTab('statsTab', this)">Summary Statistics</button>
+          <button class="tab-btn" onclick="switchTab('chartTab', this)">Data Visualization</button>
+          <button class="tab-btn" onclick="switchTab('auditTab', this)">Cleaning Log</button>
         </div>
 
-        <!-- Tab 3: Chart -->
-        <div class="tab-pane" id="chartTab">
-          <div class="chart-dashboard">
-            <div class="chart-toolbar">
-              <div class="field-item">
-                <label>Select Target Column</label>
-                <select id="chartColumn" class="select-box" onchange="updateChart()"></select>
-              </div>
-              <div class="field-item">
-                <label>Chart Representation</label>
-                <select id="chartType" class="select-box" onchange="updateChart()">
-                  <option value="histogram">Histogram / Frequency Spread</option>
-                  <option value="bar">Bar Chart (Categorical Counts)</option>
-                </select>
-              </div>
-            </div>
-            <div class="chart-canvas-container">
-              <canvas id="analyticsChart"></canvas>
+        <div class="tab-content" id="tableTab">
+          <div class="table-wrap" id="tableContainer">
+            <div class="empty-state">
+              <p>No dataset loaded. Click <strong>"Sample: Students"</strong> above or open a local CSV file.</p>
             </div>
           </div>
         </div>
 
-        <!-- Tab 4: Audit -->
-        <div class="tab-pane" id="auditTab">
-          <div class="terminal-container">
-            <div class="terminal-bar">
-              <div class="terminal-dots">
-                <span class="dot red"></span>
-                <span class="dot yellow"></span>
-                <span class="dot green"></span>
-              </div>
-              <span class="terminal-title">audit_report.log</span>
-            </div>
-            <pre class="terminal-content" id="auditViewer">Ready. Awaiting dataset operations.</pre>
+        <div class="tab-content" id="statsTab" style="display: none;">
+          <div id="statsContainer">
+            <div class="empty-state"><p>Load a dataset to view statistical metrics.</p></div>
           </div>
         </div>
-      </div>
-    </main>
-  </div>
 
-  <!-- Modal for Missing Values -->
-  <div class="modal-backdrop" id="missingModal">
-    <div class="modal-card">
-      <div class="modal-top">
-        <h3>Handle Missing Values</h3>
-        <button class="close-x" onclick="closeMissingModal()">&times;</button>
-      </div>
-      <div class="modal-fields">
-        <div class="field-item">
-          <label>Target Column</label>
-          <select id="missingCol" class="select-box"></select>
+        <div class="tab-content" id="chartTab" style="display: none;">
+          <div class="chart-options">
+            <div class="form-row">
+              <label for="chartColumn">Select Column to Plot:</label>
+              <select id="chartColumn" class="input-control" onchange="updateChart()"></select>
+            </div>
+            <div class="form-row">
+              <label for="chartType">Chart Type:</label>
+              <select id="chartType" class="input-control" onchange="updateChart()">
+                <option value="histogram">Histogram / Frequency Distribution</option>
+                <option value="bar">Bar Chart (Categorical Frequencies)</option>
+              </select>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="analyticsChart"></canvas>
+          </div>
         </div>
-        <div class="field-item">
-          <label>Imputation Strategy</label>
-          <select id="missingStrategy" class="select-box" onchange="toggleCustomVal()">
-            <option value="median">Median Imputation (Recommended for skewed numbers)</option>
-            <option value="mean">Mean Imputation (Arithmetic Average)</option>
-            <option value="mode">Mode Imputation (Most frequent value)</option>
-            <option value="custom">Custom Replacement Value</option>
-            <option value="drop_rows">Drop Rows Containing Nulls</option>
-          </select>
+
+        <div class="tab-content" id="auditTab" style="display: none;">
+          <div class="log-box">
+            <div class="log-header">
+              <span>audit_report.txt</span>
+              <button class="btn btn-sm" onclick="downloadReport()">Download Report</button>
+            </div>
+            <pre id="auditViewer">No cleaning operations performed yet.</pre>
+          </div>
         </div>
-        <div class="field-item" id="customValGroup" style="display: none;">
-          <label>Custom Value</label>
-          <input type="text" id="customValInput" class="input-box" placeholder="e.g. 0, N/A, Unknown">
-        </div>
-      </div>
-      <div class="modal-bottom">
-        <button class="nav-btn action-outline" onclick="closeMissingModal()">Cancel</button>
-        <button class="nav-btn export-btn" onclick="applyMissingStrategy()">Apply Strategy</button>
       </div>
     </div>
   </div>
 
-  <div id="toastNotification" class="toast-card"></div>
+  <div class="modal" id="missingModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Handle Missing Values</h3>
+        <button class="btn-close" onclick="closeMissingModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="missingCol">Target Column:</label>
+          <select id="missingCol" class="input-control"></select>
+        </div>
+        <div class="form-group">
+          <label for="missingStrategy">Cleaning Strategy:</label>
+          <select id="missingStrategy" class="input-control" onchange="toggleCustomVal()">
+            <option value="median">Fill with Median (Numeric)</option>
+            <option value="mean">Fill with Mean (Numeric)</option>
+            <option value="mode">Fill with Mode (Most Frequent)</option>
+            <option value="custom">Fill with Custom Value</option>
+            <option value="drop_rows">Drop Rows with Missing Values</option>
+          </select>
+        </div>
+        <div class="form-group" id="customValGroup" style="display: none;">
+          <label for="customValInput">Custom Replacement Value:</label>
+          <input type="text" id="customValInput" class="input-control" placeholder="e.g., 0, Unknown, N/A">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="closeMissingModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="applyMissingStrategy()">Apply Strategy</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
 
   <script src="/static/app.js"></script>
 </body>

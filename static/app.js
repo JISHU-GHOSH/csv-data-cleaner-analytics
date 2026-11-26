@@ -3,7 +3,6 @@ let currentDataset = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchState();
-  initDragAndDrop();
 });
 
 async function fetchState() {
@@ -12,7 +11,7 @@ async function fetchState() {
     const data = await res.json();
     renderState(data);
   } catch (err) {
-    console.error("Failed to load initial state", err);
+    console.error("Error fetching state:", err);
   }
 }
 
@@ -25,74 +24,38 @@ function renderState(data) {
   const nullBadge = document.getElementById("nullBadge");
   const headerBadge = document.getElementById("headerBadge");
 
-  const dupCard = document.getElementById("dupCard");
-  const nullCard = document.getElementById("nullCard");
-  const headerCard = document.getElementById("headerCard");
-
-  const dupPill = document.getElementById("dupPill");
-  const nullPill = document.getElementById("nullPill");
-  const headerPill = document.getElementById("headerPill");
-
   if (!data.has_data) {
-    fileBadge.innerText = "No dataset loaded";
-    shapeBadge.innerText = "0 rows × 0 columns";
+    fileBadge.innerText = "None";
+    shapeBadge.innerText = "0 rows × 0 cols";
     dupBadge.innerText = "0";
+    dupBadge.className = "value tag";
     nullBadge.innerText = "0";
-    headerBadge.innerText = "Standardized";
+    nullBadge.className = "value tag";
+    headerBadge.innerText = "Normal";
+    headerBadge.className = "value tag";
 
-    dupCard.className = "kpi-card";
-    nullCard.className = "kpi-card";
-    headerCard.className = "kpi-card";
-
-    dupPill.className = "kpi-status-pill clean";
-    dupPill.innerText = "Clean";
-    nullPill.className = "kpi-status-pill clean";
-    nullPill.innerText = "Complete";
-    headerPill.className = "kpi-status-pill clean";
-    headerPill.innerText = "Optimized";
-
-    renderDropzone();
-    document.getElementById("auditViewer").innerText = "Ready. Awaiting dataset operations.";
+    document.getElementById("tableContainer").innerHTML = '<div class="empty-state"><p>No dataset loaded. Click <strong>"Sample: Students"</strong> above or open a local CSV file.</p></div>';
+    document.getElementById("auditViewer").innerText = "No cleaning operations performed yet.";
     return;
   }
 
   fileBadge.innerText = data.filename || "Uploaded File";
-  shapeBadge.innerText = `${data.total_rows} rows × ${data.columns.length} columns`;
+  shapeBadge.innerText = `${data.total_rows} rows × ${data.columns.length} cols`;
 
   const m = data.metrics;
 
   dupBadge.innerText = m.duplicate_count;
-  if (m.duplicate_count > 0) {
-    dupCard.className = "kpi-card dirty";
-    dupPill.className = "kpi-status-pill dirty";
-    dupPill.innerText = `${m.duplicate_count} Repeats`;
-  } else {
-    dupCard.className = "kpi-card clean";
-    dupPill.className = "kpi-status-pill clean";
-    dupPill.innerText = "Clean";
-  }
+  dupBadge.className = m.duplicate_count > 0 ? "value tag danger" : "value tag";
 
   nullBadge.innerText = m.total_missing_cells;
-  if (m.total_missing_cells > 0) {
-    nullCard.className = "kpi-card dirty";
-    nullPill.className = "kpi-status-pill dirty";
-    nullPill.innerText = `${m.total_missing_cells} Nulls`;
-  } else {
-    nullCard.className = "kpi-card clean";
-    nullPill.className = "kpi-status-pill clean";
-    nullPill.innerText = "100% Filled";
-  }
+  nullBadge.className = m.total_missing_cells > 0 ? "value tag danger" : "value tag";
 
   if (m.has_unclean_headers) {
-    headerBadge.innerText = "Irregular";
-    headerCard.className = "kpi-card dirty";
-    headerPill.className = "kpi-status-pill warning";
-    headerPill.innerText = "Fix Needed";
+    headerBadge.innerText = "Needs Format";
+    headerBadge.className = "value tag warning";
   } else {
     headerBadge.innerText = "Standardized";
-    headerCard.className = "kpi-card clean";
-    headerPill.className = "kpi-status-pill clean";
-    headerPill.innerText = "Optimized";
+    headerBadge.className = "value tag";
   }
 
   renderTable(data.columns, data.rows);
@@ -103,33 +66,15 @@ function renderState(data) {
   updateChart();
 }
 
-function renderDropzone() {
-  const container = document.getElementById("tableContainer");
-  container.innerHTML = `
-    <div class="empty-dropzone" onclick="document.getElementById('fileInput').click()">
-      <div class="dropzone-icon">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      </div>
-      <h3>Drag and drop your raw CSV file here</h3>
-      <p>or click to browse files from your computer</p>
-      <div class="demo-suggestions">
-        <span>or try:</span>
-        <button type="button" class="chip-link" onclick="event.stopPropagation(); loadSample('students')">🎓 Students Demo</button>
-        <button type="button" class="chip-link" onclick="event.stopPropagation(); loadSample('sales')">💼 Sales Demo</button>
-      </div>
-    </div>
-  `;
-}
-
 function renderTable(columns, rows) {
   const container = document.getElementById("tableContainer");
   if (!rows || rows.length === 0) {
-    container.innerHTML = '<div class="empty-state" style="padding: 3rem; text-align: center; color: var(--text-muted);">Dataset is empty.</div>';
+    container.innerHTML = '<div class="empty-state"><p>The loaded dataset is empty.</p></div>';
     return;
   }
 
   let html = '<table><thead><tr>';
-  html += '<th class="row-index">#</th>';
+  html += '<th class="row-num">#</th>';
   columns.forEach(col => {
     html += `<th>${escapeHtml(col)}</th>`;
   });
@@ -137,7 +82,7 @@ function renderTable(columns, rows) {
 
   rows.forEach((row, idx) => {
     html += '<tr>';
-    html += `<td class="row-index">${idx + 1}</td>`;
+    html += `<td class="row-num">${idx + 1}</td>`;
     columns.forEach(col => {
       const val = row[col];
       if (val === null || val === undefined) {
@@ -170,7 +115,7 @@ function populateColumnDropdowns(columns) {
     chartCol.value = prevChartVal;
   }
 
-  missingCol.innerHTML = '<option value="all">All Columns (Global)</option>';
+  missingCol.innerHTML = '<option value="all">All Columns</option>';
   columns.forEach(col => {
     const opt = document.createElement("option");
     opt.value = col;
@@ -179,23 +124,8 @@ function populateColumnDropdowns(columns) {
   });
 }
 
-function initDragAndDrop() {
-  window.addEventListener("dragover", e => e.preventDefault());
-  window.addEventListener("drop", e => {
-    e.preventDefault();
-    if (e.dataTransfer && e.dataTransfer.files.length > 0) {
-      const file = e.dataTransfer.files[0];
-      if (file.name.endsWith(".csv")) {
-        uploadFileObject(file);
-      } else {
-        showToast("Please drop a valid .csv file.");
-      }
-    }
-  });
-}
-
 async function loadSample(sampleName) {
-  showToast(`Loading ${sampleName} sample...`);
+  showToast(`Loading ${sampleName} dataset...`);
   try {
     const res = await fetch("/api/load-sample", {
       method: "POST",
@@ -205,23 +135,19 @@ async function loadSample(sampleName) {
     const result = await res.json();
     if (result.success) {
       renderState(result.data);
-      showToast(`Loaded ${sampleName} dataset with deliberate flaws.`);
+      showToast(result.message);
     } else {
       showToast(result.message);
     }
   } catch (err) {
-    showToast("Error loading sample.");
+    showToast("Error loading sample dataset.");
   }
 }
 
 async function uploadCSV(event) {
   const file = event.target.files[0];
   if (!file) return;
-  await uploadFileObject(file);
-  event.target.value = "";
-}
 
-async function uploadFileObject(file) {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -239,12 +165,13 @@ async function uploadFileObject(file) {
       showToast(result.message);
     }
   } catch (err) {
-    showToast("Error uploading file.");
+    showToast("Error uploading CSV file.");
   }
+  event.target.value = "";
 }
 
 async function triggerClean(action, params = {}) {
-  showToast("Applying transformation...");
+  showToast("Applying cleaning operation...");
   try {
     const res = await fetch("/api/clean", {
       method: "POST",
@@ -259,38 +186,46 @@ async function triggerClean(action, params = {}) {
       showToast(result.message);
     }
   } catch (err) {
-    showToast("Failed to clean dataset.");
+    showToast("Operation failed.");
   }
 }
 
 async function resetData() {
-  showToast("Restoring to raw state...");
+  showToast("Restoring original data...");
   try {
     const res = await fetch("/api/reset", { method: "POST" });
     const result = await res.json();
     if (result.success) {
       renderState(result.data);
-      showToast("Dataset restored to initial state.");
+      showToast(result.message);
     } else {
       showToast(result.message);
     }
   } catch (err) {
-    showToast("Failed to reset dataset.");
+    showToast("Reset failed.");
   }
 }
 
 function downloadCleanCSV() {
+  if (!currentDataset || !currentDataset.has_data) {
+    showToast("No dataset loaded to export.");
+    return;
+  }
   window.location.href = "/api/export/csv";
 }
 
 function downloadReport() {
+  if (!currentDataset || !currentDataset.has_data) {
+    showToast("No dataset loaded to export.");
+    return;
+  }
   window.location.href = "/api/export/report";
 }
 
 async function updateStats() {
   const container = document.getElementById("statsContainer");
   if (!currentDataset || !currentDataset.has_data) {
-    container.innerHTML = '<div class="empty-state" style="padding: 3rem; text-align: center; color: var(--text-muted);">Load a dataset to view descriptive statistics.</div>';
+    container.innerHTML = '<div class="empty-state"><p>Load a dataset to view descriptive statistics.</p></div>';
     return;
   }
 
@@ -298,18 +233,18 @@ async function updateStats() {
     const res = await fetch("/api/stats");
     const data = await res.json();
 
-    let html = '<div class="stats-wrapper">';
+    let html = '<div style="display:flex; flex-direction:column; gap:20px;">';
 
     if (data.numeric && Object.keys(data.numeric).length > 0) {
-      html += '<div><div class="stats-card-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg> Five-Number Numerical Summary</div>';
-      html += '<div class="table-frame"><table><thead><tr><th>Metric</th>';
+      html += '<div><h4 style="margin-bottom:8px; font-size:13px; font-weight:600; color:#1f2328;">Five-Number Numerical Summary</h4>';
+      html += '<div class="table-wrap"><table><thead><tr><th>Metric</th>';
       const cols = Object.keys(data.numeric);
       cols.forEach(c => html += `<th>${escapeHtml(c)}</th>`);
       html += '</tr></thead><tbody>';
 
       const metrics = ["count", "mean", "std", "min", "25%", "50%", "75%", "max"];
       metrics.forEach(m => {
-        html += `<tr><td><strong style="color: #38BDF8;">${m}</strong></td>`;
+        html += `<tr><td><strong>${m}</strong></td>`;
         cols.forEach(c => {
           const val = data.numeric[c][m];
           html += `<td>${val !== undefined ? val : "-"}</td>`;
@@ -320,14 +255,14 @@ async function updateStats() {
     }
 
     if (data.categorical && Object.keys(data.categorical).length > 0) {
-      html += '<div><div class="stats-card-title"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> Categorical Frequency Distributions</div>';
+      html += '<div><h4 style="margin-bottom:8px; font-size:13px; font-weight:600; color:#1f2328;">Categorical Distributions</h4>';
       for (const [col, rows] of Object.entries(data.categorical)) {
-        html += `<h5 style="margin: 0.9rem 0 0.5rem; color: #94A3B8; font-size: 0.85rem;">Column: <span style="color: #F8FAFC;">${escapeHtml(col)}</span></h5>`;
-        html += '<div class="table-frame" style="max-height: 220px;"><table><thead><tr><th>Category</th><th>Count</th><th>Distribution (%)</th></tr></thead><tbody>';
+        html += `<div style="margin-bottom: 12px;"><h5 style="margin-bottom:4px; font-size:12px; color:#656d76;">Column: <strong>${escapeHtml(col)}</strong></h5>`;
+        html += '<div class="table-wrap" style="max-height: 180px;"><table><thead><tr><th>Category</th><th>Count</th><th>Percentage</th></tr></thead><tbody>';
         rows.forEach(r => {
-          html += `<tr><td>${escapeHtml(r.category)}</td><td>${r.count}</td><td><span style="color: #34D399; font-weight: 600;">${r.percentage}%</span></td></tr>`;
+          html += `<tr><td>${escapeHtml(r.category)}</td><td>${r.count}</td><td>${r.percentage}%</td></tr>`;
         });
-        html += '</tbody></table></div>';
+        html += '</tbody></table></div></div>';
       }
       html += '</div>';
     }
@@ -335,7 +270,7 @@ async function updateStats() {
     html += '</div>';
     container.innerHTML = html;
   } catch (err) {
-    console.error("Error updating stats", err);
+    console.error("Error updating stats:", err);
   }
 }
 
@@ -358,13 +293,12 @@ async function updateChart() {
       data: {
         labels: data.labels,
         datasets: [{
-          label: `${col}`,
+          label: col,
           data: data.values,
-          backgroundColor: "rgba(99, 102, 241, 0.75)",
-          hoverBackgroundColor: "rgba(129, 140, 248, 1)",
-          borderColor: "rgba(165, 180, 252, 0.9)",
+          backgroundColor: "#0969da",
+          borderColor: "#0969da",
           borderWidth: 1,
-          borderRadius: 6
+          borderRadius: 2
         }]
       },
       options: {
@@ -374,48 +308,39 @@ async function updateChart() {
           legend: { display: false },
           title: {
             display: true,
-            text: `Distribution Spread: ${col}`,
-            color: "#F8FAFC",
-            font: { size: 14, weight: "bold", family: "'Plus Jakarta Sans', sans-serif" }
-          },
-          tooltip: {
-            backgroundColor: "#0F172A",
-            titleColor: "#38BDF8",
-            bodyColor: "#F8FAFC",
-            borderColor: "#334155",
-            borderWidth: 1,
-            padding: 10,
-            cornerRadius: 8
+            text: `Distribution of ${col}`,
+            font: { size: 13, weight: "bold" },
+            color: "#1f2328"
           }
         },
         scales: {
           y: {
             beginAtZero: true,
-            grid: { color: "rgba(51, 65, 85, 0.3)" },
-            ticks: { color: "#94A3B8", font: { family: "'JetBrains Mono', monospace" } }
+            grid: { color: "#eaeef2" },
+            ticks: { color: "#656d76" }
           },
           x: {
             grid: { display: false },
-            ticks: { color: "#94A3B8", font: { family: "'Plus Jakarta Sans', sans-serif" } }
+            ticks: { color: "#656d76" }
           }
         }
       }
     });
   } catch (err) {
-    console.error("Error updating chart", err);
+    console.error("Error updating chart:", err);
   }
 }
 
 function switchTab(tabId, el) {
-  document.querySelectorAll(".studio-tab").forEach(btn => btn.classList.remove("active"));
-  document.querySelectorAll(".tab-pane").forEach(c => c.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
 
   if (el) {
     el.classList.add("active");
   }
   const target = document.getElementById(tabId);
   if (target) {
-    target.classList.add("active");
+    target.style.display = "block";
   }
 
   if (tabId === "chartTab") {
@@ -451,10 +376,10 @@ function applyMissingStrategy() {
 }
 
 function showToast(msg) {
-  const toast = document.getElementById("toastNotification");
+  const toast = document.getElementById("toast");
   toast.innerText = msg;
   toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 3200);
+  setTimeout(() => toast.classList.remove("show"), 2800);
 }
 
 function escapeHtml(str) {
