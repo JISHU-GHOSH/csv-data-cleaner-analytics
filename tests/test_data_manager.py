@@ -41,5 +41,20 @@ class TestDataManager(unittest.TestCase):
         self.dm.reset_to_raw()
         self.assertEqual(len(self.dm.current_df), 25)
 
+    def test_undo(self):
+        self.dm.load_csv(self.sample_path)
+        self.dm.push_history()
+        self.dm.current_df = self.dm.current_df.iloc[:10].copy()
+        self.assertEqual(len(self.dm.current_df), 10)
+        success, msg = self.dm.undo()
+        self.assertTrue(success)
+        self.assertEqual(len(self.dm.current_df), 25)
+
+    def test_quality_score(self):
+        self.dm.load_csv(self.sample_path)
+        score = self.dm.get_quality_score()
+        self.assertGreaterEqual(score, 0)
+        self.assertLessEqual(score, 100)
+
 if __name__ == "__main__":
     unittest.main()

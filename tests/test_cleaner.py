@@ -7,6 +7,8 @@ from core.cleaner import (
     handle_missing,
     trim_whitespace,
     auto_clean_all,
+    drop_column,
+    remove_outliers_iqr,
 )
 
 class TestCleaner(unittest.TestCase):
@@ -64,6 +66,19 @@ class TestCleaner(unittest.TestCase):
         self.assertFalse(clean_df.duplicated().any())
         self.assertEqual(list(clean_df.columns), ["full_name", "age", "score", "department"])
         self.assertGreater(len(log), 0)
+
+    def test_drop_column(self):
+        df, msg = drop_column(self.dirty_df, "Department")
+        self.assertNotIn("Department", df.columns)
+        self.assertIn("Dropped", msg)
+
+    def test_remove_outliers_iqr(self):
+        df_outliers = pd.DataFrame({"val": [10, 12, 11, 13, 12, 100, 11, 12, -80]})
+        clean_df, msg, count = remove_outliers_iqr(df_outliers, "val")
+        self.assertEqual(count, 2)
+        self.assertEqual(len(clean_df), 7)
+        self.assertNotIn(100, clean_df["val"].values)
+        self.assertNotIn(-80, clean_df["val"].values)
 
 if __name__ == "__main__":
     unittest.main()

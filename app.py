@@ -1,5 +1,6 @@
 import os
 import io
+import json
 import webbrowser
 import threading
 from flask import Flask, render_template, request, jsonify, send_file
@@ -50,6 +51,7 @@ def upload_file():
         data_mgr.raw_df = df.copy(deep=True)
         data_mgr.current_df = df.copy(deep=True)
         data_mgr.source_name = file.filename
+        data_mgr.history.clear()
         logger.clear()
         logger.log("File Uploaded", f"Uploaded '{file.filename}'")
         return jsonify({"success": True, "message": f"Uploaded {file.filename} successfully.", "data": get_state()})
@@ -67,6 +69,8 @@ def clean_action():
 
     payload = request.json or {}
     action = payload.get("action")
+
+    data_mgr.push_history()
 
     if action == "auto_clean":
         clean_df, logs = cleaner.auto_clean_all(data_mgr.current_df)
@@ -90,6 +94,18 @@ def clean_action():
         data_mgr.current_df = df
         logger.log("Trim Whitespace", msg)
 
+    elif action == "drop_column":
+        col = payload.get("column")
+        df, msg = cleaner.drop_column(data_mgr.current_df, col)
+        data_mgr.current_df = df
+        logger.log("Drop Column", msg)
+
+    elif action == "remove_outliers":
+        col = payload.get("column")
+        df, msg, _ = cleaner.remove_outliers_iqr(data_mgr.current_df, col)
+        data_mgr.current_df = df
+        logger.log("Remove Outliers", msg)
+
     elif action == "handle_missing":
         col = payload.get("column", "all")
         strategy = payload.get("strategy", "median")
@@ -102,6 +118,17 @@ def clean_action():
         return jsonify({"success": False, "message": f"Unknown action: {action}"}), 400
 
     return jsonify({"success": True, "message": msg, "data": get_state()})
+
+@app.route("/api/undo", methods=["POST"])
+def undo_action():
+    if not data_mgr.has_data():
+        return jsonify({"success": False, "message": "No dataset loaded."}), 400
+
+    success, msg = data_mgr.undo()
+    if success:
+        logger.log("Undo", "Reverted last cleaning operation.")
+        return jsonify({"success": True, "message": msg, "data": get_state()})
+    return jsonify({"success": False, "message": msg}), 400
 
 @app.route("/api/reset", methods=["POST"])
 def reset():
@@ -170,6 +197,16 @@ def export_csv():
     filename = f"cleaned_{data_mgr.source_name or 'dataset.csv'}"
     return send_file(bytes_data, mimetype="text/csv", as_attachment=True, download_name=filename)
 
+@app.route("/api/export/json")
+def export_json():
+    if not data_mgr.has_data():
+        return "No data to export", 400
+
+    json_str = data_mgr.current_df.to_json(orient="records", indent=2)
+    bytes_data = io.BytesIO(json_str.encode("utf-8"))
+    filename = f"cleaned_{os.path.splitext(data_mgr.source_name or 'dataset')[0]}.json"
+    return send_file(bytes_data, mimetype="application/json", as_attachment=True, download_name=filename)
+
 @app.route("/api/export/report")
 def export_report():
     if not data_mgr.has_data():
@@ -192,7 +229,7 @@ def get_state():
 
     df = data_mgr.current_df
     metrics = data_mgr.get_health_metrics()
-    display_df = df.head(100)
+    display_df = df.head(300)
 
     rows = []
     for _, r in display_df.iterrows():

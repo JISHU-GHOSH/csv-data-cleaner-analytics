@@ -53,6 +53,28 @@ def trim_whitespace(df: pd.DataFrame) -> Tuple[pd.DataFrame, str]:
 
     return new_df, f"Trimmed whitespace in {trimmed_cols} text column(s)."
 
+def drop_column(df: pd.DataFrame, column: str) -> Tuple[pd.DataFrame, str]:
+    if column not in df.columns:
+        return df, f"Column '{column}' not found."
+    new_df = df.drop(columns=[column])
+    return new_df, f"Dropped column '{column}'."
+
+def remove_outliers_iqr(df: pd.DataFrame, column: str) -> Tuple[pd.DataFrame, str, int]:
+    if column not in df.columns or not pd.api.types.is_numeric_dtype(df[column]):
+        return df, f"Column '{column}' is not numeric.", 0
+    clean_series = df[column].dropna()
+    if len(clean_series) < 4:
+        return df, "Not enough data points to compute IQR outliers.", 0
+    q1 = clean_series.quantile(0.25)
+    q3 = clean_series.quantile(0.75)
+    iqr = q3 - q1
+    lower_bound = q1 - 1.5 * iqr
+    upper_bound = q3 + 1.5 * iqr
+    mask = (df[column] >= lower_bound) & (df[column] <= upper_bound) | df[column].isna()
+    filtered_df = df[mask].reset_index(drop=True)
+    removed = len(df) - len(filtered_df)
+    return filtered_df, f"Removed {removed} outlier row(s) in '{column}' using 1.5x IQR.", removed
+
 def handle_missing(
     df: pd.DataFrame,
     column: str,

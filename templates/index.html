@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSV Cleaner & Analytics | Every tool you need to clean and analyze CSVs</title>
+  <title>CSV Cleaner & Analytics | Professional Data Preprocessing Suite</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,7 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <!-- Clean Red/White Header -->
+  <!-- Navigation Header -->
   <header class="ilove-nav">
     <div class="nav-wrapper">
       <div class="ilove-logo" onclick="resetToHome()">
@@ -21,7 +21,7 @@
       </div>
 
       <nav class="ilove-menu">
-        <button class="menu-item active" onclick="showView('homeView')">All CSV Tools</button>
+        <button class="menu-item active" onclick="resetToHome()">All Tools</button>
         <button class="menu-item" onclick="loadSample('students')">Students Sample</button>
         <button class="menu-item" onclick="loadSample('sales')">Sales Sample</button>
       </nav>
@@ -35,18 +35,18 @@
     </div>
   </header>
 
-  <!-- VIEW 1: Home View (iLovePDF Homepage with big CTA & Tool Cards Grid) -->
+  <!-- VIEW 1: Home View -->
   <div id="homeView" class="view-screen">
     <section class="hero-section">
       <h1 class="hero-title">Every tool you need to clean, fix & analyze CSV files</h1>
-      <p class="hero-desc">100% free, fast, and easy to use. Clean messy data, remove duplicate rows, fill missing values, and export clean datasets in seconds.</p>
+      <p class="hero-desc">Fast, intuitive, and interactive. Clean messy datasets, deduplicate rows, handle missing values, and export clean data in seconds.</p>
 
       <div class="hero-upload-container">
         <label class="btn-ilove-cta">
           Select CSV file
           <input type="file" id="heroFileInput" accept=".csv" onchange="uploadCSV(event)" hidden>
         </label>
-        <span class="upload-subtext">or drop CSVs here</span>
+        <span class="upload-subtext">or drop CSVs anywhere on this page</span>
 
         <div class="sample-pills">
           <span>Or test with sample data:</span>
@@ -56,7 +56,7 @@
       </div>
     </section>
 
-    <!-- iLovePDF 6-Tool Cards Grid -->
+    <!-- 6-Tool Feature Cards -->
     <section class="tools-grid-section">
       <div class="tools-grid">
         <div class="tool-card" onclick="openDirectTool('auto_clean')">
@@ -83,24 +83,23 @@
           <p>Transform messy column names into clean, lowercase, space-free standard identifiers.</p>
         </div>
 
+        <div class="tool-card" onclick="openDirectTool('outliers')">
+          <div class="tool-icon teal">🎯</div>
+          <h3>Outlier Removal</h3>
+          <p>Detect and filter extreme anomalies and statistical outliers using 1.5x IQR.</p>
+        </div>
+
         <div class="tool-card" onclick="openDirectTool('stats')">
           <div class="tool-icon green">📈</div>
           <h3>Descriptive Statistics</h3>
           <p>Calculate five-number summaries, mean, median, min, max, and categorical frequencies.</p>
         </div>
-
-        <div class="tool-card" onclick="openDirectTool('charts')">
-          <div class="tool-icon teal">📊</div>
-          <h3>Visual Charts</h3>
-          <p>Plot interactive histograms and categorical frequency distributions in real time.</p>
-        </div>
       </div>
     </section>
   </div>
 
-  <!-- VIEW 2: Active Editor / Tool Screen (when CSV is loaded) -->
+  <!-- VIEW 2: Active Editor / Tool Screen -->
   <div id="editorView" class="view-screen" style="display: none;">
-    <!-- Active File Bar -->
     <div class="editor-header">
       <div class="file-summary">
         <div class="file-icon">📄</div>
@@ -114,9 +113,20 @@
         </div>
       </div>
 
+      <!-- Health Score Meter -->
+      <div class="quality-meter">
+        <div class="meter-label">
+          <span>Data Quality Score</span>
+          <strong id="qualityScoreText">0%</strong>
+        </div>
+        <div class="meter-bar">
+          <div class="meter-fill" id="qualityScoreFill" style="width: 0%;"></div>
+        </div>
+      </div>
+
       <div class="editor-actions">
-        <button class="btn-subtle" onclick="resetData()">Reset to Original</button>
-        <button class="btn-subtle" onclick="document.getElementById('fileInput').click()">Change File</button>
+        <button class="btn-subtle" id="undoBtn" onclick="triggerUndo()" title="Undo last cleaning step">↶ Undo</button>
+        <button class="btn-subtle" onclick="resetData()">Reset</button>
         <button class="btn-ilove-red" onclick="triggerClean('auto_clean')">Auto-Clean CSV</button>
       </div>
     </div>
@@ -128,6 +138,9 @@
       <button class="strip-btn" onclick="triggerClean('remove_duplicates')">Drop Duplicates</button>
       <button class="strip-btn" onclick="openMissingModal()">Fill Missing Values</button>
       <button class="strip-btn" onclick="triggerClean('trim_whitespace')">Trim Spaces</button>
+      <button class="strip-btn" onclick="openDropColModal()">Drop Column</button>
+      <button class="strip-btn" onclick="openOutliersModal()">Filter Outliers</button>
+
       <div class="strip-spacer"></div>
       <button class="strip-btn active" id="tabGridBtn" onclick="switchEditorTab('gridTab')">Spreadsheet View</button>
       <button class="strip-btn" id="tabStatsBtn" onclick="switchEditorTab('statsTab')">Summary Stats</button>
@@ -137,8 +150,21 @@
 
     <!-- Workspace Panes -->
     <div class="editor-content">
-      <!-- Pane 1: Table -->
+      <!-- Pane 1: Table with Search & Pagination -->
       <div class="editor-pane active" id="gridTab">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="tableSearchInput" placeholder="Filter rows by keyword..." oninput="onSearchInput()">
+          </div>
+          <div class="table-pagination-info">
+            <span id="paginationLabel">Showing 0 of 0 rows</span>
+            <div class="pagination-buttons">
+              <button class="btn-page" id="prevPageBtn" onclick="prevPage()">Previous</button>
+              <button class="btn-page" id="nextPageBtn" onclick="nextPage()">Next</button>
+            </div>
+          </div>
+        </div>
         <div class="sheet-container" id="tableContainer"></div>
       </div>
 
@@ -179,12 +205,13 @@
       </div>
     </div>
 
-    <!-- Bottom Action Dock with Large iLovePDF CTA -->
+    <!-- Bottom Action Dock with Export Formats -->
     <div class="bottom-dock">
       <div class="dock-left">
         <span id="dockStatusText">Ready to export.</span>
       </div>
       <div class="dock-right">
+        <button class="btn-subtle" onclick="downloadCleanJSON()">Export JSON</button>
         <button class="btn-subtle" onclick="downloadReport()">Audit Report (.txt)</button>
         <button class="btn-ilove-cta-bottom" onclick="downloadCleanCSV()">
           Download Cleaned CSV
@@ -199,7 +226,7 @@
     <div class="ilove-modal-card">
       <div class="ilove-modal-header">
         <h3>Fill or Remove Missing Values</h3>
-        <button class="close-btn" onclick="closeMissingModal()">&times;</button>
+        <button class="close-btn" onclick="closeModal('missingModal')">&times;</button>
       </div>
       <div class="ilove-modal-body">
         <div class="form-row">
@@ -222,8 +249,49 @@
         </div>
       </div>
       <div class="ilove-modal-footer">
-        <button class="btn-subtle" onclick="closeMissingModal()">Cancel</button>
+        <button class="btn-subtle" onclick="closeModal('missingModal')">Cancel</button>
         <button class="btn-ilove-red" onclick="applyMissingStrategy()">Apply Strategy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Dropping Columns -->
+  <div class="ilove-modal" id="dropColModal">
+    <div class="ilove-modal-card">
+      <div class="ilove-modal-header">
+        <h3>Drop Column</h3>
+        <button class="close-btn" onclick="closeModal('dropColModal')">&times;</button>
+      </div>
+      <div class="ilove-modal-body">
+        <div class="form-row">
+          <label>Select Column to Delete:</label>
+          <select id="dropColSelect" class="ilove-select"></select>
+        </div>
+      </div>
+      <div class="ilove-modal-footer">
+        <button class="btn-subtle" onclick="closeModal('dropColModal')">Cancel</button>
+        <button class="btn-ilove-red" onclick="applyDropColumn()">Delete Column</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Outlier Removal -->
+  <div class="ilove-modal" id="outliersModal">
+    <div class="ilove-modal-card">
+      <div class="ilove-modal-header">
+        <h3>Filter Statistical Outliers</h3>
+        <button class="close-btn" onclick="closeModal('outliersModal')">&times;</button>
+      </div>
+      <div class="ilove-modal-body">
+        <div class="form-row">
+          <label>Numeric Column:</label>
+          <select id="outlierColSelect" class="ilove-select"></select>
+        </div>
+        <p style="font-size: 13px; color: #666;">Uses the standard Tukey IQR method (Q1 - 1.5&times;IQR to Q3 + 1.5&times;IQR) to strip extreme abnormal values.</p>
+      </div>
+      <div class="ilove-modal-footer">
+        <button class="btn-subtle" onclick="closeModal('outliersModal')">Cancel</button>
+        <button class="btn-ilove-red" onclick="applyRemoveOutliers()">Filter Outliers</button>
       </div>
     </div>
   </div>

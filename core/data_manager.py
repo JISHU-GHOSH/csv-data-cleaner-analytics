@@ -1,5 +1,5 @@
 import os
-from typing import Tuple, Dict, Any, Optional
+from typing import Tuple, Dict, Any, Optional, List
 import pandas as pd
 
 class DataManager:
@@ -7,9 +7,22 @@ class DataManager:
         self.raw_df: Optional[pd.DataFrame] = None
         self.current_df: Optional[pd.DataFrame] = None
         self.source_name: str = ""
+        self.history: List[pd.DataFrame] = []
 
     def has_data(self) -> bool:
         return self.current_df is not None and not self.current_df.empty
+
+    def push_history(self) -> None:
+        if self.current_df is not None:
+            self.history.append(self.current_df.copy(deep=True))
+            if len(self.history) > 15:
+                self.history.pop(0)
+
+    def undo(self) -> Tuple[bool, str]:
+        if not self.history:
+            return False, "Nothing to undo."
+        self.current_df = self.history.pop()
+        return True, "Reverted to previous state."
 
     def load_csv(self, filepath: str) -> Tuple[bool, str]:
         if not os.path.exists(filepath):
@@ -27,6 +40,7 @@ class DataManager:
                 self.raw_df = df.copy(deep=True)
                 self.current_df = df.copy(deep=True)
                 self.source_name = os.path.basename(filepath)
+                self.history.clear()
                 return True, f"Loaded {self.source_name} successfully ({len(df)} rows, {len(df.columns)} columns)."
             except Exception as e:
                 last_error = str(e)
@@ -47,8 +61,28 @@ class DataManager:
         if self.raw_df is None:
             return False, "No original dataset to restore."
 
+        self.push_history()
         self.current_df = self.raw_df.copy(deep=True)
         return True, "Dataset restored to original loaded state."
+
+    def get_quality_score(self) -> int:
+        if not self.has_data() or self.current_df is None:
+            return 0
+        df = self.current_df
+        total_cells = df.size
+        if total_cells == 0:
+            return 0
+        missing_cells = df.isna().sum().sum()
+        completeness = max(0.0, 1.0 - (missing_cells / total_cells))
+
+        dup_rows = df.duplicated().sum()
+        uniqueness = max(0.0, 1.0 - (dup_rows / len(df))) if len(df) > 0 else 1.0
+
+        has_unclean = any(col != col.strip().lower().replace(" ", "_") for col in df.columns)
+        header_score = 0.8 if has_unclean else 1.0
+
+        score = int((completeness * 0.5 + uniqueness * 0.3 + header_score * 0.2) * 100)
+        return min(100, max(0, score))
 
     def get_health_metrics(self) -> Dict[str, Any]:
         if not self.has_data() or self.current_df is None:
@@ -61,6 +95,8 @@ class DataManager:
                 "has_unclean_headers": False,
                 "columns": [],
                 "dtypes": {},
+                "quality_score": 0,
+                "can_undo": False,
             }
 
         df = self.current_df
@@ -83,4 +119,6 @@ class DataManager:
             "has_unclean_headers": has_unclean_headers,
             "columns": list(df.columns),
             "dtypes": {str(k): str(v) for k, v in df.dtypes.to_dict().items()},
+            "quality_score": self.get_quality_score(),
+            "can_undo": len(self.history) > 0,
         }
