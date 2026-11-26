@@ -3,196 +3,210 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSV Data Cleaner & Analytics Studio</title>
+  <title>iLoveCSV | Every tool you need to clean and analyze CSVs</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <header class="navbar">
-    <div class="nav-left">
-      <div class="logo-mark">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+  <!-- iLovePDF Style Header -->
+  <header class="ilove-nav">
+    <div class="nav-wrapper">
+      <div class="ilove-logo" onclick="resetToHome()">
+        <span class="logo-prefix">i</span><span class="logo-heart">❤️</span><span class="logo-suffix">CSV</span>
       </div>
-      <div class="logo-text">
-        <span class="logo-title">CSV Cleaner & Analytics</span>
-        <span class="logo-tag">Python Practical</span>
-      </div>
-    </div>
 
-    <div class="nav-right">
-      <button class="btn btn-secondary" onclick="loadSample('students')">Students Sample</button>
-      <button class="btn btn-secondary" onclick="loadSample('sales')">Sales Sample</button>
-      <label class="btn btn-primary">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
-        Upload CSV
-        <input type="file" id="fileInput" accept=".csv" onchange="uploadCSV(event)" hidden>
-      </label>
-      <button class="btn btn-ghost" onclick="resetData()" title="Reset to raw loaded state">Reset</button>
-      <button class="btn btn-success" onclick="downloadCleanCSV()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-        Export CSV
-      </button>
+      <nav class="ilove-menu">
+        <button class="menu-item active" onclick="showView('homeView')">All CSV Tools</button>
+        <button class="menu-item" onclick="loadSample('students')">Students Sample</button>
+        <button class="menu-item" onclick="loadSample('sales')">Sales Sample</button>
+      </nav>
+
+      <div class="nav-right">
+        <label class="btn-select-small">
+          Select CSV File
+          <input type="file" id="fileInput" accept=".csv" onchange="uploadCSV(event)" hidden>
+        </label>
+      </div>
     </div>
   </header>
 
-  <main class="main-layout">
-    <section class="metrics-row">
-      <div class="metric-card">
-        <div class="metric-meta">
-          <span class="metric-title">Source File</span>
-          <span class="metric-icon">📄</span>
-        </div>
-        <div class="metric-value truncate" id="fileBadge">None Loaded</div>
-        <div class="metric-sub" id="shapeBadge">0 rows &times; 0 cols</div>
-      </div>
+  <!-- VIEW 1: Home View (iLovePDF Homepage with big CTA & Tool Cards Grid) -->
+  <div id="homeView" class="view-screen">
+    <section class="hero-section">
+      <h1 class="hero-title">Every tool you need to clean, fix & analyze CSV files</h1>
+      <p class="hero-desc">100% free, fast, and easy to use. Clean messy data, remove duplicate rows, fill missing values, and export clean datasets in seconds.</p>
 
-      <div class="metric-card" id="dupCard">
-        <div class="metric-meta">
-          <span class="metric-title">Duplicate Rows</span>
-          <span class="metric-icon">👥</span>
-        </div>
-        <div class="metric-value" id="dupBadge">0</div>
-        <div class="status-pill status-clean" id="dupPill">No Duplicates</div>
-      </div>
+      <div class="hero-upload-container">
+        <label class="btn-ilove-cta">
+          Select CSV file
+          <input type="file" id="heroFileInput" accept=".csv" onchange="uploadCSV(event)" hidden>
+        </label>
+        <span class="upload-subtext">or drop CSVs here</span>
 
-      <div class="metric-card" id="nullCard">
-        <div class="metric-meta">
-          <span class="metric-title">Missing Cells</span>
-          <span class="metric-icon">⚠️</span>
+        <div class="sample-pills">
+          <span>Or test with sample data:</span>
+          <button class="sample-pill-btn" onclick="loadSample('students')">🎓 Students Dataset (Dirty)</button>
+          <button class="sample-pill-btn" onclick="loadSample('sales')">💼 Sales Dataset (Dirty)</button>
         </div>
-        <div class="metric-value" id="nullBadge">0</div>
-        <div class="status-pill status-clean" id="nullPill">Zero Missing</div>
-      </div>
-
-      <div class="metric-card" id="headerCard">
-        <div class="metric-meta">
-          <span class="metric-title">Headers Format</span>
-          <span class="metric-icon">🏷️</span>
-        </div>
-        <div class="metric-value" id="headerBadge">Standard</div>
-        <div class="status-pill status-clean" id="headerPill">Clean</div>
       </div>
     </section>
 
-    <div class="workspace">
-      <aside class="sidebar">
-        <div class="card">
-          <div class="card-header">
-            <h3>Cleaning Tools</h3>
-          </div>
-          <div class="card-body tools-list">
-            <button class="action-btn auto-btn" onclick="triggerClean('auto_clean')">
-              <span class="action-btn-title">Auto-Clean All</span>
-              <span class="action-btn-desc">Deduplicate, normalize headers & impute</span>
-            </button>
-
-            <button class="action-btn" onclick="triggerClean('standardize_headers')">
-              <span class="action-btn-title">Standardize Headers</span>
-              <span class="action-btn-desc">Lowercase, trim spaces, underscores</span>
-            </button>
-
-            <button class="action-btn" onclick="triggerClean('remove_duplicates')">
-              <span class="action-btn-title">Remove Duplicates</span>
-              <span class="action-btn-desc">Drop all repeated rows</span>
-            </button>
-
-            <button class="action-btn" onclick="openMissingModal()">
-              <span class="action-btn-title">Handle Missing Values</span>
-              <span class="action-btn-desc">Fill with Mean, Median, Mode or Drop</span>
-            </button>
-
-            <button class="action-btn" onclick="triggerClean('trim_whitespace')">
-              <span class="action-btn-title">Trim Text Whitespace</span>
-              <span class="action-btn-desc">Strip extra spaces in string columns</span>
-            </button>
-          </div>
+    <!-- iLovePDF 6-Tool Cards Grid -->
+    <section class="tools-grid-section">
+      <div class="tools-grid">
+        <div class="tool-card" onclick="openDirectTool('auto_clean')">
+          <div class="tool-icon red">⚡</div>
+          <h3>Auto-Clean All</h3>
+          <p>Deduplicate rows, standardize column headers, and impute null values in one single click.</p>
         </div>
 
-        <div class="card export-card">
-          <div class="card-header">
-            <h3>Audit Changelog</h3>
-          </div>
-          <div class="card-body">
-            <p class="export-hint">Every cleaning transformation is recorded in a verifiable audit trail.</p>
-            <button class="btn btn-secondary btn-block" onclick="downloadReport()">Download Audit Log</button>
-          </div>
-        </div>
-      </aside>
-
-      <section class="content-panel">
-        <div class="panel-tabs">
-          <button class="tab-item active" onclick="switchTab('tableTab', this)">Data Preview</button>
-          <button class="tab-item" onclick="switchTab('statsTab', this)">Summary Statistics</button>
-          <button class="tab-item" onclick="switchTab('chartTab', this)">Visual Distributions</button>
-          <button class="tab-item" onclick="switchTab('auditTab', this)">Audit Report</button>
+        <div class="tool-card" onclick="openDirectTool('remove_duplicates')">
+          <div class="tool-icon orange">🗑️</div>
+          <h3>Remove Duplicates</h3>
+          <p>Detect and strip out repeated rows from your dataset while preserving unique entries.</p>
         </div>
 
-        <div class="panel-body">
-          <div class="tab-pane active" id="tableTab">
-            <div class="table-container" id="tableContainer">
-              <div class="empty-state">
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                <p>No dataset loaded. Select <strong>Students Sample</strong> or upload a CSV file.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="tab-pane" id="statsTab">
-            <div id="statsContainer">
-              <div class="empty-state"><p>Load a dataset to view descriptive statistics.</p></div>
-            </div>
-          </div>
-
-          <div class="tab-pane" id="chartTab">
-            <div class="chart-controls-bar">
-              <div class="control-field">
-                <label>Target Column:</label>
-                <select id="chartColumn" class="select-input" onchange="updateChart()"></select>
-              </div>
-              <div class="control-field">
-                <label>Plot Type:</label>
-                <select id="chartType" class="select-input" onchange="updateChart()">
-                  <option value="histogram">Histogram / Frequency Spread</option>
-                  <option value="bar">Bar Chart (Categorical Counts)</option>
-                </select>
-              </div>
-            </div>
-            <div class="chart-canvas-box">
-              <canvas id="analyticsChart"></canvas>
-            </div>
-          </div>
-
-          <div class="tab-pane" id="auditTab">
-            <div class="audit-console">
-              <div class="audit-console-bar">
-                <span>audit_report.txt</span>
-                <button class="btn btn-sm" onclick="downloadReport()">Download</button>
-              </div>
-              <pre id="auditViewer">Awaiting dataset operations.</pre>
-            </div>
-          </div>
+        <div class="tool-card" onclick="openDirectTool('handle_missing')">
+          <div class="tool-icon blue">🩹</div>
+          <h3>Handle Missing Values</h3>
+          <p>Impute missing numbers with mean/median, fill text with mode, or drop null records.</p>
         </div>
-      </section>
-    </div>
-  </main>
 
-  <div class="modal" id="missingModal">
-    <div class="modal-dialog">
-      <div class="modal-head">
-        <h3>Handle Missing Values</h3>
-        <button class="modal-close-btn" onclick="closeMissingModal()">&times;</button>
+        <div class="tool-card" onclick="openDirectTool('standardize_headers')">
+          <div class="tool-icon purple">🔤</div>
+          <h3>Standardize Headers</h3>
+          <p>Transform messy column names into clean, lowercase, space-free standard identifiers.</p>
+        </div>
+
+        <div class="tool-card" onclick="openDirectTool('stats')">
+          <div class="tool-icon green">📈</div>
+          <h3>Descriptive Statistics</h3>
+          <p>Calculate five-number summaries, mean, median, min, max, and categorical frequencies.</p>
+        </div>
+
+        <div class="tool-card" onclick="openDirectTool('charts')">
+          <div class="tool-icon teal">📊</div>
+          <h3>Visual Charts</h3>
+          <p>Plot interactive histograms and categorical frequency distributions in real time.</p>
+        </div>
       </div>
-      <div class="modal-content">
-        <div class="input-group">
-          <label>Target Column:</label>
-          <select id="missingCol" class="select-input"></select>
+    </section>
+  </div>
+
+  <!-- VIEW 2: Active Editor / Tool Screen (when CSV is loaded) -->
+  <div id="editorView" class="view-screen" style="display: none;">
+    <!-- Active File Bar -->
+    <div class="editor-header">
+      <div class="file-summary">
+        <div class="file-icon">📄</div>
+        <div class="file-info">
+          <h2 id="activeFileName">dataset.csv</h2>
+          <div class="file-meta">
+            <span id="activeDimensions">0 rows &times; 0 cols</span> &bull;
+            <span id="dupCountTag" class="tag red">0 duplicates</span> &bull;
+            <span id="nullCountTag" class="tag red">0 missing cells</span>
+          </div>
         </div>
-        <div class="input-group">
-          <label>Strategy:</label>
-          <select id="missingStrategy" class="select-input" onchange="toggleCustomVal()">
+      </div>
+
+      <div class="editor-actions">
+        <button class="btn-subtle" onclick="resetData()">Reset to Original</button>
+        <button class="btn-subtle" onclick="document.getElementById('fileInput').click()">Change File</button>
+        <button class="btn-ilove-red" onclick="triggerClean('auto_clean')">Auto-Clean CSV</button>
+      </div>
+    </div>
+
+    <!-- Quick Action Pills Strip -->
+    <div class="action-strip">
+      <span class="strip-label">Tools:</span>
+      <button class="strip-btn" onclick="triggerClean('standardize_headers')">Format Headers</button>
+      <button class="strip-btn" onclick="triggerClean('remove_duplicates')">Drop Duplicates</button>
+      <button class="strip-btn" onclick="openMissingModal()">Fill Missing Values</button>
+      <button class="strip-btn" onclick="triggerClean('trim_whitespace')">Trim Spaces</button>
+      <div class="strip-spacer"></div>
+      <button class="strip-btn active" id="tabGridBtn" onclick="switchEditorTab('gridTab')">Spreadsheet View</button>
+      <button class="strip-btn" id="tabStatsBtn" onclick="switchEditorTab('statsTab')">Summary Stats</button>
+      <button class="strip-btn" id="tabChartBtn" onclick="switchEditorTab('chartTab')">Visual Charts</button>
+      <button class="strip-btn" id="tabLogBtn" onclick="switchEditorTab('logTab')">Audit Changelog</button>
+    </div>
+
+    <!-- Workspace Panes -->
+    <div class="editor-content">
+      <!-- Pane 1: Table -->
+      <div class="editor-pane active" id="gridTab">
+        <div class="sheet-container" id="tableContainer"></div>
+      </div>
+
+      <!-- Pane 2: Stats -->
+      <div class="editor-pane" id="statsTab" style="display: none;">
+        <div id="statsContainer" class="stats-box"></div>
+      </div>
+
+      <!-- Pane 3: Charts -->
+      <div class="editor-pane" id="chartTab" style="display: none;">
+        <div class="chart-box">
+          <div class="chart-bar">
+            <label>Select Column:
+              <select id="chartColumn" class="ilove-select" onchange="updateChart()"></select>
+            </label>
+            <label>Chart Type:
+              <select id="chartType" class="ilove-select" onchange="updateChart()">
+                <option value="histogram">Histogram / Frequency Spread</option>
+                <option value="bar">Bar Chart (Categorical Counts)</option>
+              </select>
+            </label>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="analyticsChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pane 4: Audit -->
+      <div class="editor-pane" id="logTab" style="display: none;">
+        <div class="log-card">
+          <div class="log-card-header">
+            <span>cleaning_audit_report.txt</span>
+            <button class="btn-sm" onclick="downloadReport()">Download Text Log</button>
+          </div>
+          <pre id="auditViewer">No cleaning operations performed yet.</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Action Dock with Large iLovePDF CTA -->
+    <div class="bottom-dock">
+      <div class="dock-left">
+        <span id="dockStatusText">Ready to export.</span>
+      </div>
+      <div class="dock-right">
+        <button class="btn-subtle" onclick="downloadReport()">Audit Report (.txt)</button>
+        <button class="btn-ilove-cta-bottom" onclick="downloadCleanCSV()">
+          Download Cleaned CSV
+          <span class="cta-arrow">&rarr;</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Missing Values -->
+  <div class="ilove-modal" id="missingModal">
+    <div class="ilove-modal-card">
+      <div class="ilove-modal-header">
+        <h3>Fill or Remove Missing Values</h3>
+        <button class="close-btn" onclick="closeMissingModal()">&times;</button>
+      </div>
+      <div class="ilove-modal-body">
+        <div class="form-row">
+          <label>Target Column:</label>
+          <select id="missingCol" class="ilove-select"></select>
+        </div>
+        <div class="form-row">
+          <label>Imputation Strategy:</label>
+          <select id="missingStrategy" class="ilove-select" onchange="toggleCustomVal()">
             <option value="median">Fill with Median (Numeric)</option>
             <option value="mean">Fill with Mean (Numeric)</option>
             <option value="mode">Fill with Mode (Most Frequent)</option>
@@ -200,19 +214,19 @@
             <option value="drop_rows">Drop Rows Containing Nulls</option>
           </select>
         </div>
-        <div class="input-group" id="customValGroup" style="display: none;">
-          <label>Custom Value:</label>
-          <input type="text" id="customValInput" class="text-input" placeholder="e.g. 0, N/A, Unknown">
+        <div class="form-row" id="customValGroup" style="display: none;">
+          <label>Custom Replacement Value:</label>
+          <input type="text" id="customValInput" class="ilove-input" placeholder="e.g. 0, Unknown, N/A">
         </div>
       </div>
-      <div class="modal-foot">
-        <button class="btn btn-secondary" onclick="closeMissingModal()">Cancel</button>
-        <button class="btn btn-primary" onclick="applyMissingStrategy()">Apply Strategy</button>
+      <div class="ilove-modal-footer">
+        <button class="btn-subtle" onclick="closeMissingModal()">Cancel</button>
+        <button class="btn-ilove-red" onclick="applyMissingStrategy()">Apply Strategy</button>
       </div>
     </div>
   </div>
 
-  <div id="toast" class="toast"></div>
+  <div id="toastNotification" class="ilove-toast"></div>
 
   <script src="/static/app.js"></script>
 </body>

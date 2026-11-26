@@ -3,6 +3,7 @@ let currentDataset = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   fetchState();
+  initDragAndDrop();
 });
 
 async function fetchState() {
@@ -18,74 +19,38 @@ async function fetchState() {
 function renderState(data) {
   currentDataset = data;
 
-  const fileBadge = document.getElementById("fileBadge");
-  const shapeBadge = document.getElementById("shapeBadge");
-  const dupBadge = document.getElementById("dupBadge");
-  const nullBadge = document.getElementById("nullBadge");
-  const headerBadge = document.getElementById("headerBadge");
-
-  const dupPill = document.getElementById("dupPill");
-  const nullPill = document.getElementById("nullPill");
-  const headerPill = document.getElementById("headerPill");
+  const homeView = document.getElementById("homeView");
+  const editorView = document.getElementById("editorView");
 
   if (!data.has_data) {
-    fileBadge.innerText = "None Loaded";
-    shapeBadge.innerText = "0 rows × 0 cols";
-    dupBadge.innerText = "0";
-    nullBadge.innerText = "0";
-    headerBadge.innerText = "Standard";
-
-    dupPill.className = "status-pill status-clean";
-    dupPill.innerText = "No Duplicates";
-    nullPill.className = "status-pill status-clean";
-    nullPill.innerText = "Zero Missing";
-    headerPill.className = "status-pill status-clean";
-    headerPill.innerText = "Clean";
-
-    document.getElementById("tableContainer").innerHTML = `
-      <div class="empty-state">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        <p>No dataset loaded. Select <strong>Students Sample</strong> or upload a CSV file.</p>
-      </div>`;
-    document.getElementById("auditViewer").innerText = "Awaiting dataset operations.";
+    homeView.style.display = "block";
+    editorView.style.display = "none";
     return;
   }
 
-  fileBadge.innerText = data.filename || "Uploaded File";
-  shapeBadge.innerText = `${data.total_rows} rows × ${data.columns.length} cols`;
+  homeView.style.display = "none";
+  editorView.style.display = "block";
+
+  document.getElementById("activeFileName").innerText = data.filename || "dataset.csv";
+  document.getElementById("activeDimensions").innerText = `${data.total_rows} rows × ${data.columns.length} columns`;
 
   const m = data.metrics;
+  const dupTag = document.getElementById("dupCountTag");
+  const nullTag = document.getElementById("nullCountTag");
 
-  dupBadge.innerText = m.duplicate_count;
-  if (m.duplicate_count > 0) {
-    dupPill.className = "status-pill status-dirty";
-    dupPill.innerText = `${m.duplicate_count} Repeats`;
-  } else {
-    dupPill.className = "status-pill status-clean";
-    dupPill.innerText = "No Duplicates";
-  }
+  dupTag.innerText = m.duplicate_count > 0 ? `${m.duplicate_count} duplicate rows` : "0 duplicates";
+  dupTag.className = m.duplicate_count > 0 ? "tag red" : "tag green";
 
-  nullBadge.innerText = m.total_missing_cells;
-  if (m.total_missing_cells > 0) {
-    nullPill.className = "status-pill status-dirty";
-    nullPill.innerText = `${m.total_missing_cells} Missing`;
-  } else {
-    nullPill.className = "status-pill status-clean";
-    nullPill.innerText = "Zero Missing";
-  }
+  nullTag.innerText = m.total_missing_cells > 0 ? `${m.total_missing_cells} missing cells` : "0 missing cells";
+  nullTag.className = m.total_missing_cells > 0 ? "tag red" : "tag green";
 
-  if (m.has_unclean_headers) {
-    headerBadge.innerText = "Irregular";
-    headerPill.className = "status-pill status-warning";
-    headerPill.innerText = "Needs Format";
-  } else {
-    headerBadge.innerText = "Standard";
-    headerPill.className = "status-pill status-clean";
-    headerPill.innerText = "Clean";
-  }
+  document.getElementById("dockStatusText").innerText =
+    m.duplicate_count === 0 && m.total_missing_cells === 0
+      ? "Dataset is 100% clean and ready for export."
+      : "Data issues detected. Click 'Auto-Clean CSV' or select individual tools above.";
 
   renderTable(data.columns, data.rows);
-  document.getElementById("auditViewer").innerText = data.report_text || "No actions logged.";
+  document.getElementById("auditViewer").innerText = data.report_text || "No cleaning actions performed yet.";
 
   populateColumnDropdowns(data.columns);
   updateStats();
@@ -95,7 +60,7 @@ function renderState(data) {
 function renderTable(columns, rows) {
   const container = document.getElementById("tableContainer");
   if (!rows || rows.length === 0) {
-    container.innerHTML = '<div class="empty-state"><p>The loaded dataset is empty.</p></div>';
+    container.innerHTML = '<div style="padding: 24px; text-align: center; color: #888;">The loaded dataset is empty.</div>';
     return;
   }
 
@@ -150,8 +115,23 @@ function populateColumnDropdowns(columns) {
   });
 }
 
+function initDragAndDrop() {
+  window.addEventListener("dragover", e => e.preventDefault());
+  window.addEventListener("drop", e => {
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      if (file.name.endsWith(".csv")) {
+        uploadFileObject(file);
+      } else {
+        showToast("Please drop a valid .csv file.");
+      }
+    }
+  });
+}
+
 async function loadSample(sampleName) {
-  showToast(`Loading ${sampleName} dataset...`);
+  showToast(`Loading ${sampleName} sample...`);
   try {
     const res = await fetch("/api/load-sample", {
       method: "POST",
@@ -173,7 +153,11 @@ async function loadSample(sampleName) {
 async function uploadCSV(event) {
   const file = event.target.files[0];
   if (!file) return;
+  await uploadFileObject(file);
+  event.target.value = "";
+}
 
+async function uploadFileObject(file) {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -193,7 +177,6 @@ async function uploadCSV(event) {
   } catch (err) {
     showToast("Error uploading CSV file.");
   }
-  event.target.value = "";
 }
 
 async function triggerClean(action, params = {}) {
@@ -223,13 +206,65 @@ async function resetData() {
     const result = await res.json();
     if (result.success) {
       renderState(result.data);
-      showToast(result.message);
+      showToast("Restored original dataset.");
     } else {
       showToast(result.message);
     }
   } catch (err) {
     showToast("Reset failed.");
   }
+}
+
+function resetToHome() {
+  document.getElementById("homeView").style.display = "block";
+  document.getElementById("editorView").style.display = "none";
+}
+
+function openDirectTool(toolName) {
+  if (!currentDataset || !currentDataset.has_data) {
+    loadSample("students").then(() => {
+      executeToolAction(toolName);
+    });
+  } else {
+    executeToolAction(toolName);
+  }
+}
+
+function executeToolAction(toolName) {
+  if (toolName === "auto_clean") {
+    triggerClean("auto_clean");
+    switchEditorTab("gridTab");
+  } else if (toolName === "remove_duplicates") {
+    triggerClean("remove_duplicates");
+    switchEditorTab("gridTab");
+  } else if (toolName === "standardize_headers") {
+    triggerClean("standardize_headers");
+    switchEditorTab("gridTab");
+  } else if (toolName === "handle_missing") {
+    openMissingModal();
+  } else if (toolName === "stats") {
+    switchEditorTab("statsTab");
+  } else if (toolName === "charts") {
+    switchEditorTab("chartTab");
+  }
+}
+
+function switchEditorTab(tabId) {
+  document.querySelectorAll(".editor-pane").forEach(p => p.style.display = "none");
+  document.querySelectorAll(".action-strip .strip-btn").forEach(b => b.classList.remove("active"));
+
+  const targetPane = document.getElementById(tabId);
+  if (targetPane) {
+    targetPane.style.display = "block";
+  }
+
+  if (tabId === "gridTab") document.getElementById("tabGridBtn")?.classList.add("active");
+  if (tabId === "statsTab") document.getElementById("tabStatsBtn")?.classList.add("active");
+  if (tabId === "chartTab") {
+    document.getElementById("tabChartBtn")?.classList.add("active");
+    setTimeout(updateChart, 50);
+  }
+  if (tabId === "logTab") document.getElementById("tabLogBtn")?.classList.add("active");
 }
 
 function downloadCleanCSV() {
@@ -251,7 +286,7 @@ function downloadReport() {
 async function updateStats() {
   const container = document.getElementById("statsContainer");
   if (!currentDataset || !currentDataset.has_data) {
-    container.innerHTML = '<div class="empty-state"><p>Load a dataset to view descriptive statistics.</p></div>';
+    container.innerHTML = '<div style="padding: 24px; text-align: center; color: #888;">Load a dataset to view statistics.</div>';
     return;
   }
 
@@ -262,15 +297,15 @@ async function updateStats() {
     let html = '<div style="display:flex; flex-direction:column; gap:20px;">';
 
     if (data.numeric && Object.keys(data.numeric).length > 0) {
-      html += '<div><h4 style="margin-bottom:8px; font-size:13px; font-weight:600; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em;">Five-Number Numerical Summary</h4>';
-      html += '<div class="table-container"><table><thead><tr><th>Metric</th>';
+      html += '<div><h4 style="margin-bottom:10px; font-size:14px; font-weight:700; color:#161616;">Five-Number Numerical Summary</h4>';
+      html += '<div class="sheet-container"><table><thead><tr><th>Metric</th>';
       const cols = Object.keys(data.numeric);
       cols.forEach(c => html += `<th>${escapeHtml(c)}</th>`);
       html += '</tr></thead><tbody>';
 
       const metrics = ["count", "mean", "std", "min", "25%", "50%", "75%", "max"];
       metrics.forEach(m => {
-        html += `<tr><td><strong style="color: #60A5FA;">${m}</strong></td>`;
+        html += `<tr><td><strong>${m}</strong></td>`;
         cols.forEach(c => {
           const val = data.numeric[c][m];
           html += `<td>${val !== undefined ? val : "-"}</td>`;
@@ -281,12 +316,12 @@ async function updateStats() {
     }
 
     if (data.categorical && Object.keys(data.categorical).length > 0) {
-      html += '<div><h4 style="margin-bottom:8px; font-size:13px; font-weight:600; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em;">Categorical Distributions</h4>';
+      html += '<div><h4 style="margin-bottom:10px; font-size:14px; font-weight:700; color:#161616;">Categorical Frequencies</h4>';
       for (const [col, rows] of Object.entries(data.categorical)) {
-        html += `<div style="margin-bottom: 14px;"><h5 style="margin-bottom:6px; font-size:12px; color:#D1D5DB;">Column: <strong style="color:#F3F4F6;">${escapeHtml(col)}</strong></h5>`;
-        html += '<div class="table-container" style="max-height: 180px;"><table><thead><tr><th>Category</th><th>Count</th><th>Percentage</th></tr></thead><tbody>';
+        html += `<div style="margin-bottom: 14px;"><h5 style="margin-bottom:6px; font-size:13px; color:#555;">Column: <strong>${escapeHtml(col)}</strong></h5>`;
+        html += '<div class="sheet-container" style="max-height: 180px;"><table><thead><tr><th>Category</th><th>Count</th><th>Percentage</th></tr></thead><tbody>';
         rows.forEach(r => {
-          html += `<tr><td>${escapeHtml(r.category)}</td><td>${r.count}</td><td><span style="color:#34D399; font-weight:600;">${r.percentage}%</span></td></tr>`;
+          html += `<tr><td>${escapeHtml(r.category)}</td><td>${r.count}</td><td><span style="color:#16A34A; font-weight:600;">${r.percentage}%</span></td></tr>`;
         });
         html += '</tbody></table></div></div>';
       }
@@ -321,8 +356,9 @@ async function updateChart() {
         datasets: [{
           label: col,
           data: data.values,
-          backgroundColor: "#3B82F6",
-          borderColor: "#60A5FA",
+          backgroundColor: "#E5322D",
+          hoverBackgroundColor: "#C5221F",
+          borderColor: "#E5322D",
           borderWidth: 1,
           borderRadius: 4
         }]
@@ -335,26 +371,19 @@ async function updateChart() {
           title: {
             display: true,
             text: `Distribution of ${col}`,
-            font: { size: 13, weight: "bold", family: "'Inter', sans-serif" },
-            color: "#F3F4F6"
-          },
-          tooltip: {
-            backgroundColor: "#1F2937",
-            borderColor: "#374151",
-            borderWidth: 1,
-            titleColor: "#93C5FD",
-            bodyColor: "#F3F4F6"
+            font: { size: 14, weight: "bold" },
+            color: "#161616"
           }
         },
         scales: {
           y: {
             beginAtZero: true,
-            grid: { color: "#1F2937" },
-            ticks: { color: "#9CA3AF" }
+            grid: { color: "#F3F4F6" },
+            ticks: { color: "#666" }
           },
           x: {
             grid: { display: false },
-            ticks: { color: "#9CA3AF" }
+            ticks: { color: "#666" }
           }
         }
       }
@@ -364,26 +393,9 @@ async function updateChart() {
   }
 }
 
-function switchTab(tabId, el) {
-  document.querySelectorAll(".tab-item").forEach(btn => btn.classList.remove("active"));
-  document.querySelectorAll(".tab-pane").forEach(c => c.style.display = "none");
-
-  if (el) {
-    el.classList.add("active");
-  }
-  const target = document.getElementById(tabId);
-  if (target) {
-    target.style.display = "block";
-  }
-
-  if (tabId === "chartTab") {
-    setTimeout(updateChart, 50);
-  }
-}
-
 function openMissingModal() {
   if (!currentDataset || !currentDataset.has_data) {
-    showToast("Please load a dataset first.");
+    showToast("Please select a CSV file first.");
     return;
   }
   document.getElementById("missingModal").style.display = "flex";
@@ -409,7 +421,7 @@ function applyMissingStrategy() {
 }
 
 function showToast(msg) {
-  const toast = document.getElementById("toast");
+  const toast = document.getElementById("toastNotification");
   toast.innerText = msg;
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 2800);
