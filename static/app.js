@@ -24,18 +24,30 @@ function renderState(data) {
   const nullBadge = document.getElementById("nullBadge");
   const headerBadge = document.getElementById("headerBadge");
 
+  const dupPill = document.getElementById("dupPill");
+  const nullPill = document.getElementById("nullPill");
+  const headerPill = document.getElementById("headerPill");
+
   if (!data.has_data) {
-    fileBadge.innerText = "None";
+    fileBadge.innerText = "None Loaded";
     shapeBadge.innerText = "0 rows × 0 cols";
     dupBadge.innerText = "0";
-    dupBadge.className = "value tag";
     nullBadge.innerText = "0";
-    nullBadge.className = "value tag";
-    headerBadge.innerText = "Normal";
-    headerBadge.className = "value tag";
+    headerBadge.innerText = "Standard";
 
-    document.getElementById("tableContainer").innerHTML = '<div class="empty-state"><p>No dataset loaded. Click <strong>"Sample: Students"</strong> above or open a local CSV file.</p></div>';
-    document.getElementById("auditViewer").innerText = "No cleaning operations performed yet.";
+    dupPill.className = "status-pill status-clean";
+    dupPill.innerText = "No Duplicates";
+    nullPill.className = "status-pill status-clean";
+    nullPill.innerText = "Zero Missing";
+    headerPill.className = "status-pill status-clean";
+    headerPill.innerText = "Clean";
+
+    document.getElementById("tableContainer").innerHTML = `
+      <div class="empty-state">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <p>No dataset loaded. Select <strong>Students Sample</strong> or upload a CSV file.</p>
+      </div>`;
+    document.getElementById("auditViewer").innerText = "Awaiting dataset operations.";
     return;
   }
 
@@ -45,17 +57,31 @@ function renderState(data) {
   const m = data.metrics;
 
   dupBadge.innerText = m.duplicate_count;
-  dupBadge.className = m.duplicate_count > 0 ? "value tag danger" : "value tag";
+  if (m.duplicate_count > 0) {
+    dupPill.className = "status-pill status-dirty";
+    dupPill.innerText = `${m.duplicate_count} Repeats`;
+  } else {
+    dupPill.className = "status-pill status-clean";
+    dupPill.innerText = "No Duplicates";
+  }
 
   nullBadge.innerText = m.total_missing_cells;
-  nullBadge.className = m.total_missing_cells > 0 ? "value tag danger" : "value tag";
+  if (m.total_missing_cells > 0) {
+    nullPill.className = "status-pill status-dirty";
+    nullPill.innerText = `${m.total_missing_cells} Missing`;
+  } else {
+    nullPill.className = "status-pill status-clean";
+    nullPill.innerText = "Zero Missing";
+  }
 
   if (m.has_unclean_headers) {
-    headerBadge.innerText = "Needs Format";
-    headerBadge.className = "value tag warning";
+    headerBadge.innerText = "Irregular";
+    headerPill.className = "status-pill status-warning";
+    headerPill.innerText = "Needs Format";
   } else {
-    headerBadge.innerText = "Standardized";
-    headerBadge.className = "value tag";
+    headerBadge.innerText = "Standard";
+    headerPill.className = "status-pill status-clean";
+    headerPill.innerText = "Clean";
   }
 
   renderTable(data.columns, data.rows);
@@ -74,7 +100,7 @@ function renderTable(columns, rows) {
   }
 
   let html = '<table><thead><tr>';
-  html += '<th class="row-num">#</th>';
+  html += '<th class="row-index">#</th>';
   columns.forEach(col => {
     html += `<th>${escapeHtml(col)}</th>`;
   });
@@ -82,7 +108,7 @@ function renderTable(columns, rows) {
 
   rows.forEach((row, idx) => {
     html += '<tr>';
-    html += `<td class="row-num">${idx + 1}</td>`;
+    html += `<td class="row-index">${idx + 1}</td>`;
     columns.forEach(col => {
       const val = row[col];
       if (val === null || val === undefined) {
@@ -236,15 +262,15 @@ async function updateStats() {
     let html = '<div style="display:flex; flex-direction:column; gap:20px;">';
 
     if (data.numeric && Object.keys(data.numeric).length > 0) {
-      html += '<div><h4 style="margin-bottom:8px; font-size:13px; font-weight:600; color:#1f2328;">Five-Number Numerical Summary</h4>';
-      html += '<div class="table-wrap"><table><thead><tr><th>Metric</th>';
+      html += '<div><h4 style="margin-bottom:8px; font-size:13px; font-weight:600; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em;">Five-Number Numerical Summary</h4>';
+      html += '<div class="table-container"><table><thead><tr><th>Metric</th>';
       const cols = Object.keys(data.numeric);
       cols.forEach(c => html += `<th>${escapeHtml(c)}</th>`);
       html += '</tr></thead><tbody>';
 
       const metrics = ["count", "mean", "std", "min", "25%", "50%", "75%", "max"];
       metrics.forEach(m => {
-        html += `<tr><td><strong>${m}</strong></td>`;
+        html += `<tr><td><strong style="color: #60A5FA;">${m}</strong></td>`;
         cols.forEach(c => {
           const val = data.numeric[c][m];
           html += `<td>${val !== undefined ? val : "-"}</td>`;
@@ -255,12 +281,12 @@ async function updateStats() {
     }
 
     if (data.categorical && Object.keys(data.categorical).length > 0) {
-      html += '<div><h4 style="margin-bottom:8px; font-size:13px; font-weight:600; color:#1f2328;">Categorical Distributions</h4>';
+      html += '<div><h4 style="margin-bottom:8px; font-size:13px; font-weight:600; color:#9CA3AF; text-transform:uppercase; letter-spacing:0.04em;">Categorical Distributions</h4>';
       for (const [col, rows] of Object.entries(data.categorical)) {
-        html += `<div style="margin-bottom: 12px;"><h5 style="margin-bottom:4px; font-size:12px; color:#656d76;">Column: <strong>${escapeHtml(col)}</strong></h5>`;
-        html += '<div class="table-wrap" style="max-height: 180px;"><table><thead><tr><th>Category</th><th>Count</th><th>Percentage</th></tr></thead><tbody>';
+        html += `<div style="margin-bottom: 14px;"><h5 style="margin-bottom:6px; font-size:12px; color:#D1D5DB;">Column: <strong style="color:#F3F4F6;">${escapeHtml(col)}</strong></h5>`;
+        html += '<div class="table-container" style="max-height: 180px;"><table><thead><tr><th>Category</th><th>Count</th><th>Percentage</th></tr></thead><tbody>';
         rows.forEach(r => {
-          html += `<tr><td>${escapeHtml(r.category)}</td><td>${r.count}</td><td>${r.percentage}%</td></tr>`;
+          html += `<tr><td>${escapeHtml(r.category)}</td><td>${r.count}</td><td><span style="color:#34D399; font-weight:600;">${r.percentage}%</span></td></tr>`;
         });
         html += '</tbody></table></div></div>';
       }
@@ -295,10 +321,10 @@ async function updateChart() {
         datasets: [{
           label: col,
           data: data.values,
-          backgroundColor: "#0969da",
-          borderColor: "#0969da",
+          backgroundColor: "#3B82F6",
+          borderColor: "#60A5FA",
           borderWidth: 1,
-          borderRadius: 2
+          borderRadius: 4
         }]
       },
       options: {
@@ -309,19 +335,26 @@ async function updateChart() {
           title: {
             display: true,
             text: `Distribution of ${col}`,
-            font: { size: 13, weight: "bold" },
-            color: "#1f2328"
+            font: { size: 13, weight: "bold", family: "'Inter', sans-serif" },
+            color: "#F3F4F6"
+          },
+          tooltip: {
+            backgroundColor: "#1F2937",
+            borderColor: "#374151",
+            borderWidth: 1,
+            titleColor: "#93C5FD",
+            bodyColor: "#F3F4F6"
           }
         },
         scales: {
           y: {
             beginAtZero: true,
-            grid: { color: "#eaeef2" },
-            ticks: { color: "#656d76" }
+            grid: { color: "#1F2937" },
+            ticks: { color: "#9CA3AF" }
           },
           x: {
             grid: { display: false },
-            ticks: { color: "#656d76" }
+            ticks: { color: "#9CA3AF" }
           }
         }
       }
@@ -332,8 +365,8 @@ async function updateChart() {
 }
 
 function switchTab(tabId, el) {
-  document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-  document.querySelectorAll(".tab-content").forEach(c => c.style.display = "none");
+  document.querySelectorAll(".tab-item").forEach(btn => btn.classList.remove("active"));
+  document.querySelectorAll(".tab-pane").forEach(c => c.style.display = "none");
 
   if (el) {
     el.classList.add("active");
