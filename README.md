@@ -1,6 +1,9 @@
 # 📊 CSV Data Cleaner & Analytics Studio
-> **A Desktop Application for Automated Data Inspection, Cleaning, Statistical Analysis & Visualization in Python.**  
+> **A Web & Desktop Application for Automated Data Inspection, Cleaning, Statistical Analysis & Visualization in Python.**  
 > Built for College End-Semester Practical Examinations and Viva Voce.
+
+🌐 **Live Website:** [https://csv-data-cleaner-analytics.vercel.app](https://csv-data-cleaner-analytics.vercel.app)  
+📁 **GitHub Repository:** [https://github.com/JISHU-GHOSH/csv-data-cleaner-analytics](https://github.com/JISHU-GHOSH/csv-data-cleaner-analytics)
 
 ---
 
