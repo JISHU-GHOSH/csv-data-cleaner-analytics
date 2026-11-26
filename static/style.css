@@ -54,15 +54,20 @@ body {
 .ilove-logo {
   display: flex;
   align-items: center;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
   cursor: pointer;
   user-select: none;
+  gap: 6px;
+}
+
+.logo-icon {
+  font-size: 20px;
+  line-height: 1;
 }
 
 .logo-prefix { color: #161616; }
-.logo-heart { color: var(--ilove-red); margin: 0 1px; font-size: 22px; }
 .logo-suffix { color: var(--ilove-red); }
 
 .ilove-menu {
