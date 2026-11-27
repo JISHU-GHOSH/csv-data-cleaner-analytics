@@ -107,6 +107,9 @@ def handle_missing(
             if pd.api.types.is_numeric_dtype(col_series):
                 fill_val = col_series.mean()
                 new_df[col] = col_series.fillna(fill_val)
+            elif column == "all":
+                # Gracefully skip non-numeric columns when applying across all columns
+                continue
             else:
                 return new_df, f"Cannot compute mean for non-numeric column '{col}'."
 
@@ -114,6 +117,9 @@ def handle_missing(
             if pd.api.types.is_numeric_dtype(col_series):
                 fill_val = col_series.median()
                 new_df[col] = col_series.fillna(fill_val)
+            elif column == "all":
+                # Gracefully skip non-numeric columns when applying across all columns
+                continue
             else:
                 return new_df, f"Cannot compute median for non-numeric column '{col}'."
 

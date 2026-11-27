@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSV Cleaner & Analytics | Professional Data Preprocessing Suite</title>
+  <title>CSV Cleaner & Analytics Studio | Team ROCKET — JECRC University</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -11,19 +11,24 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
   <!-- Navigation Header -->
   <header class="ilove-nav">
     <div class="nav-wrapper">
       <div class="ilove-logo" onclick="resetToHome()">
         <span class="logo-icon">📊</span>
-        <span class="logo-prefix">CSV Cleaner</span>
-        <span class="logo-suffix">& Analytics</span>
+        <span class="logo-prefix">CSVCleaner</span>
+        <span class="logo-suffix">&amp; Studio</span>
+        <span class="team-badge" onclick="event.stopPropagation(); openTeamModal();">🚀 Team ROCKET</span>
       </div>
 
       <nav class="ilove-menu">
-        <button class="menu-item active" onclick="resetToHome()">All Tools</button>
-        <button class="menu-item" onclick="loadSample('students')">Students Sample</button>
-        <button class="menu-item" onclick="loadSample('sales')">Sales Sample</button>
+        <button class="menu-item active" id="navAllTools" onclick="resetToHome()">All Tools</button>
+        <button class="menu-item" id="navStudents" onclick="loadSample('students')">Students Sample</button>
+        <button class="menu-item" id="navSales" onclick="loadSample('sales')">Sales Sample</button>
+        <button class="menu-item nav-accent" onclick="window.open('/docs/report', '_blank')">📑 Project Report</button>
+        <button class="menu-item nav-accent" onclick="window.open('/docs/paper', '_blank')">🔬 Research Paper</button>
+        <button class="menu-item nav-accent" onclick="openTeamModal()">👥 Team Info</button>
       </nav>
 
       <div class="nav-right">
@@ -38,64 +43,136 @@
   <!-- VIEW 1: Home View -->
   <div id="homeView" class="view-screen">
     <section class="hero-section">
-      <h1 class="hero-title">Every tool you need to clean, fix & analyze CSV files</h1>
-      <p class="hero-desc">Fast, intuitive, and interactive. Clean messy datasets, deduplicate rows, handle missing values, and export clean data in seconds.</p>
+      <div class="academic-tag">🎓 JECRC UNIVERSITY &bull; B.TECH MAJOR PROJECT 2025–26 &bull; TEAM ROCKET</div>
+      <h1 class="hero-title">Automated CSV Data Cleaner &amp; Analytics Studio</h1>
+      <p class="hero-desc">Deterministic tabular preprocessing, statistical outlier detection (1.5&times; IQR), automated imputation, and real-time data health profiling in sub-50 milliseconds.</p>
 
       <div class="hero-upload-container">
         <label class="btn-ilove-cta">
-          Select CSV file
+          Select CSV file to Clean
           <input type="file" id="heroFileInput" accept=".csv" onchange="uploadCSV(event)" hidden>
         </label>
-        <span class="upload-subtext">or drop CSVs anywhere on this page</span>
+        <span class="upload-subtext">or drag and drop CSV files anywhere on this window</span>
 
         <div class="sample-pills">
-          <span>Or test with sample data:</span>
-          <button class="sample-pill-btn" onclick="loadSample('students')">🎓 Students Dataset (Dirty)</button>
-          <button class="sample-pill-btn" onclick="loadSample('sales')">💼 Sales Dataset (Dirty)</button>
+          <span class="sample-label">Or test live with dirty university benchmarks:</span>
+          <button class="sample-pill-btn" onclick="loadSample('students')">🎓 Students Cohort Dataset (Dirty)</button>
+          <button class="sample-pill-btn" onclick="loadSample('sales')">💼 Sales Transactions Dataset (Dirty)</button>
         </div>
       </div>
     </section>
 
     <!-- 6-Tool Feature Cards -->
     <section class="tools-grid-section">
+      <div class="section-title-wrap">
+        <h2 class="section-title">Automated Tabular Sanitization Tools</h2>
+        <p class="section-subtitle">Click any module below to load benchmark data and execute real-time cleaning.</p>
+      </div>
+
       <div class="tools-grid">
         <div class="tool-card" onclick="openDirectTool('auto_clean')">
           <div class="tool-icon red">⚡</div>
-          <h3>Auto-Clean All</h3>
-          <p>Deduplicate rows, standardize column headers, and impute null values in one single click.</p>
+          <h3>1-Click Auto-Clean</h3>
+          <p>Deduplicate rows, standardize column headers into snake_case, trim whitespaces, and impute null values automatically.</p>
         </div>
 
         <div class="tool-card" onclick="openDirectTool('remove_duplicates')">
           <div class="tool-icon orange">🗑️</div>
-          <h3>Remove Duplicates</h3>
-          <p>Detect and strip out repeated rows from your dataset while preserving unique entries.</p>
+          <h3>Row Deduplication</h3>
+          <p>Identify and purge redundant records with high-speed hashing while maintaining original chronological row order.</p>
         </div>
 
         <div class="tool-card" onclick="openDirectTool('handle_missing')">
           <div class="tool-icon blue">🩹</div>
-          <h3>Handle Missing Values</h3>
-          <p>Impute missing numbers with mean/median, fill text with mode, or drop null records.</p>
+          <h3>Smart Imputation</h3>
+          <p>Fill numeric missing values with robust Median/Mean, categorical fields with Mode, or purge defective rows.</p>
         </div>
 
         <div class="tool-card" onclick="openDirectTool('standardize_headers')">
           <div class="tool-icon purple">🔤</div>
-          <h3>Standardize Headers</h3>
-          <p>Transform messy column names into clean, lowercase, space-free standard identifiers.</p>
+          <h3>Header Normalization</h3>
+          <p>Sanitize unstandardized, space-padded column names into clean, uniform, programmatic snake_case identifiers.</p>
         </div>
 
         <div class="tool-card" onclick="openDirectTool('outliers')">
           <div class="tool-icon teal">🎯</div>
-          <h3>Outlier Removal</h3>
-          <p>Detect and filter extreme anomalies and statistical outliers using 1.5x IQR.</p>
+          <h3>Tukey 1.5&times; IQR Outlier Filter</h3>
+          <p>Detect and isolate abnormal numerical values outside [Q1 - 1.5&times;IQR, Q3 + 1.5&times;IQR] with zero distribution distortion.</p>
         </div>
 
         <div class="tool-card" onclick="openDirectTool('stats')">
           <div class="tool-icon green">📈</div>
-          <h3>Descriptive Statistics</h3>
-          <p>Calculate five-number summaries, mean, median, min, max, and categorical frequencies.</p>
+          <h3>Descriptive Profiling</h3>
+          <p>Calculate five-number summaries, standard deviation, variances, and categorical distributions instantly.</p>
         </div>
       </div>
     </section>
+
+    <!-- Academic Project Deliverables Showcase -->
+    <section class="academic-showcase-section">
+      <div class="section-title-wrap">
+        <h2 class="section-title">Project Documentation &amp; Evaluation Deliverables</h2>
+        <p class="section-subtitle">Complete academic files prepared for internal and external examination committees.</p>
+      </div>
+
+      <div class="deliverables-grid">
+        <div class="deliverable-card">
+          <div class="card-badge">Official Submission</div>
+          <div class="card-icon">📑</div>
+          <h3>B.Tech Major Project Report</h3>
+          <p>Strictly compliant with JECRC University guidelines (A4, 1.5" gutter margin, Times New Roman, 6 Chapters, UML/DFD diagrams, references).</p>
+          <div class="card-meta">Lead: <strong>Parth Kothari (25BCON0044)</strong></div>
+          <div class="card-actions">
+            <a href="/docs/report" target="_blank" class="btn-card-action">View Web Report</a>
+            <a href="/download/report-docx" class="btn-card-outline">Download .DOCX</a>
+          </div>
+        </div>
+
+        <div class="deliverable-card">
+          <div class="card-badge">Conference Ready</div>
+          <div class="card-icon">🔬</div>
+          <h3>IEEE Format Research Paper</h3>
+          <p>Double-column empirical study on deterministic preprocessing, Tukey's IQR boundaries, and Data Quality Index (DQI) benchmarks.</p>
+          <div class="card-meta">Lead: <strong>Twisha Srivastava (25BCON0266)</strong></div>
+          <div class="card-actions">
+            <a href="/docs/paper" target="_blank" class="btn-card-action">Read Paper Online</a>
+            <a href="/download/paper-docx" class="btn-card-outline">Download .DOCX</a>
+          </div>
+        </div>
+
+        <div class="deliverable-card">
+          <div class="card-badge">Presentation Deck</div>
+          <div class="card-icon">📽️</div>
+          <h3>Major Project Presentation Deck</h3>
+          <p>14-slide executive presentation covering problem statement, system architecture, comparative benchmarks, and live demo results.</p>
+          <div class="card-meta">Lead: <strong>Hardik Udawat (25BCON0081)</strong></div>
+          <div class="card-actions">
+            <a href="/download/presentation-pptx" class="btn-card-action">Download PPTX</a>
+            <button onclick="openTeamModal()" class="btn-card-outline">View Team Credits</button>
+          </div>
+        </div>
+
+        <div class="deliverable-card">
+          <div class="card-badge">Core Engine</div>
+          <div class="card-icon">⚙️</div>
+          <h3>Python Data Analytics Pipeline</h3>
+          <p>Standalone empirical demonstration using Pandas, NumPy, and Matplotlib with automated 3-panel statistical figure generation.</p>
+          <div class="card-meta">Lead: <strong>Jishu Ghosh (25BCON0022)</strong></div>
+          <div class="card-actions">
+            <button onclick="loadSample('students')" class="btn-card-action">Run Interactive App</button>
+            <a href="https://github.com/JISHU-GHOSH/csv-data-cleaner-analytics" target="_blank" class="btn-card-outline">GitHub Repo</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p><strong>CSVCleaner &amp; Analytics Studio</strong> &bull; Major Project 2025–26 &bull; Department of Computer Science &amp; Engineering, JECRC University, Jaipur</p>
+        <p style="margin-top: 6px; font-size: 13px; color: #888;">Developed by <strong>Team ROCKET</strong>: Parth Kothari, Hardik Udawat, Twisha Srivastava, and Jishu Ghosh. Under the Supervision of Dr./Mr./Ms. XYZ.</p>
+      </div>
+    </footer>
   </div>
 
   <!-- VIEW 2: Active Editor / Tool Screen -->
@@ -116,7 +193,7 @@
       <!-- Health Score Meter -->
       <div class="quality-meter">
         <div class="meter-label">
-          <span>Data Quality Score</span>
+          <span>Data Quality Score (DQI)</span>
           <strong id="qualityScoreText">0%</strong>
         </div>
         <div class="meter-bar">
@@ -125,27 +202,32 @@
       </div>
 
       <div class="editor-actions">
-        <button class="btn-subtle" id="undoBtn" onclick="triggerUndo()" title="Undo last cleaning step">↶ Undo</button>
-        <button class="btn-subtle" onclick="resetData()">Reset</button>
-        <button class="btn-ilove-red" onclick="triggerClean('auto_clean')">Auto-Clean CSV</button>
+        <button class="btn-subtle" id="undoBtn" onclick="triggerUndo()" title="Undo last cleaning operation">↶ Undo</button>
+        <button class="btn-subtle" onclick="resetData()" title="Revert to raw dataset">Reset</button>
+        <button class="btn-ilove-red" onclick="triggerClean('auto_clean')" title="Execute full automated cleaning pipeline">⚡ Auto-Clean CSV</button>
       </div>
     </div>
 
     <!-- Quick Action Pills Strip -->
-    <div class="action-strip">
-      <span class="strip-label">Tools:</span>
-      <button class="strip-btn" onclick="triggerClean('standardize_headers')">Format Headers</button>
-      <button class="strip-btn" onclick="triggerClean('remove_duplicates')">Drop Duplicates</button>
-      <button class="strip-btn" onclick="openMissingModal()">Fill Missing Values</button>
-      <button class="strip-btn" onclick="triggerClean('trim_whitespace')">Trim Spaces</button>
-      <button class="strip-btn" onclick="openDropColModal()">Drop Column</button>
-      <button class="strip-btn" onclick="openOutliersModal()">Filter Outliers</button>
+    <div class="action-strip-container">
+      <div class="action-strip">
+        <div class="strip-group">
+          <span class="strip-label">Cleaning Tools:</span>
+          <button class="strip-btn" onclick="triggerClean('standardize_headers')" title="Format column headers to snake_case">Format Headers</button>
+          <button class="strip-btn" onclick="triggerClean('remove_duplicates')" title="Strip duplicate rows">Drop Duplicates</button>
+          <button class="strip-btn" onclick="openMissingModal()" title="Fill missing cells">Fill Missing</button>
+          <button class="strip-btn" onclick="triggerClean('trim_whitespace')" title="Strip whitespace from strings">Trim Spaces</button>
+          <button class="strip-btn" onclick="openDropColModal()" title="Delete unwanted column">Drop Column</button>
+          <button class="strip-btn" onclick="openOutliersModal()" title="Filter outliers using Tukey 1.5x IQR">Filter Outliers</button>
+        </div>
 
-      <div class="strip-spacer"></div>
-      <button class="strip-btn active" id="tabGridBtn" onclick="switchEditorTab('gridTab')">Spreadsheet View</button>
-      <button class="strip-btn" id="tabStatsBtn" onclick="switchEditorTab('statsTab')">Summary Stats</button>
-      <button class="strip-btn" id="tabChartBtn" onclick="switchEditorTab('chartTab')">Visual Charts</button>
-      <button class="strip-btn" id="tabLogBtn" onclick="switchEditorTab('logTab')">Audit Changelog</button>
+        <div class="strip-tabs">
+          <button class="strip-btn active" id="tabGridBtn" onclick="switchEditorTab('gridTab')">Spreadsheet View</button>
+          <button class="strip-btn" id="tabStatsBtn" onclick="switchEditorTab('statsTab')">Summary Stats</button>
+          <button class="strip-btn" id="tabChartBtn" onclick="switchEditorTab('chartTab')">Visual Charts</button>
+          <button class="strip-btn" id="tabLogBtn" onclick="switchEditorTab('logTab')">Audit Changelog</button>
+        </div>
+      </div>
     </div>
 
     <!-- Workspace Panes -->
@@ -211,9 +293,9 @@
         <span id="dockStatusText">Ready to export.</span>
       </div>
       <div class="dock-right">
-        <button class="btn-subtle" onclick="downloadCleanJSON()">Export JSON</button>
-        <button class="btn-subtle" onclick="downloadReport()">Audit Report (.txt)</button>
-        <button class="btn-ilove-cta-bottom" onclick="downloadCleanCSV()">
+        <button class="btn-subtle" onclick="downloadCleanJSON()" title="Export cleaned data as JSON">Export JSON</button>
+        <button class="btn-subtle" onclick="downloadReport()" title="Export text audit changelog">Audit Report (.txt)</button>
+        <button class="btn-ilove-cta-bottom" onclick="downloadCleanCSV()" title="Download complete sanitized CSV">
           Download Cleaned CSV
           <span class="cta-arrow">&rarr;</span>
         </button>
@@ -284,14 +366,80 @@
       </div>
       <div class="ilove-modal-body">
         <div class="form-row">
-          <label>Numeric Column:</label>
+          <label>Numeric Column to Filter:</label>
           <select id="outlierColSelect" class="ilove-select"></select>
         </div>
-        <p style="font-size: 13px; color: #666;">Uses the standard Tukey IQR method (Q1 - 1.5&times;IQR to Q3 + 1.5&times;IQR) to strip extreme abnormal values.</p>
+        <p style="font-size: 13px; color: #666; margin-top: 8px;">
+          Calculates Tukey's fences: <code>[Q1 - 1.5&times;IQR, Q3 + 1.5&times;IQR]</code> and isolates extreme anomalies without affecting valid distribution spread.
+        </p>
       </div>
       <div class="ilove-modal-footer">
         <button class="btn-subtle" onclick="closeModal('outliersModal')">Cancel</button>
         <button class="btn-ilove-red" onclick="applyRemoveOutliers()">Filter Outliers</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Team ROCKET Credits & Academic Info -->
+  <div class="ilove-modal" id="teamModal">
+    <div class="ilove-modal-card team-modal-card">
+      <div class="ilove-modal-header">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 24px;">🚀</span>
+          <div>
+            <h3 style="margin: 0; font-size: 18px;">Team ROCKET &bull; Project Credits</h3>
+            <span style="font-size: 12px; color: #666;">JECRC University &bull; B.Tech CSE (Session 2025–26)</span>
+          </div>
+        </div>
+        <button class="close-btn" onclick="closeModal('teamModal')">&times;</button>
+      </div>
+      <div class="ilove-modal-body">
+        <div class="supervisor-box">
+          <div class="supervisor-title">Supervision &amp; Faculty Guide</div>
+          <div class="supervisor-name">Dr./Mr./Ms. XYZ, Assistant Professor</div>
+          <div class="supervisor-dept">Department of Computer Science &amp; Engineering, JECRC University, Jaipur</div>
+        </div>
+
+        <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 12px; color: #161616;">Project Team Members &amp; Responsibilities:</h4>
+        <div class="team-members-list">
+          <div class="member-row">
+            <div class="member-avatar">PK</div>
+            <div class="member-details">
+              <div class="member-name">Parth Kothari <span class="member-id">(25BCON0044)</span></div>
+              <div class="member-role">Project Report File &amp; Technical Documentation Lead</div>
+            </div>
+          </div>
+          <div class="member-row">
+            <div class="member-avatar">HU</div>
+            <div class="member-details">
+              <div class="member-name">Hardik Udawat <span class="member-id">(25BCON0081)</span></div>
+              <div class="member-role">Project Presentation (PPT Deck) &amp; Delivery Lead</div>
+            </div>
+          </div>
+          <div class="member-row">
+            <div class="member-avatar">TS</div>
+            <div class="member-details">
+              <div class="member-name">Twisha Srivastava <span class="member-id">(25BCON0266)</span></div>
+              <div class="member-role">Research Paper &amp; Empirical Methodology Lead</div>
+            </div>
+          </div>
+          <div class="member-row">
+            <div class="member-avatar">JG</div>
+            <div class="member-details">
+              <div class="member-name">Jishu Ghosh <span class="member-id">(25BCON0022)</span></div>
+              <div class="member-role">Software Architecture, Core Development &amp; Cloud Deployment Lead</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-deliverables-links">
+          <a href="/docs/report" target="_blank" class="btn-subtle" style="font-size: 12px; text-decoration: none;">View Report</a>
+          <a href="/docs/paper" target="_blank" class="btn-subtle" style="font-size: 12px; text-decoration: none;">View Paper</a>
+          <a href="/download/presentation-pptx" class="btn-subtle" style="font-size: 12px; text-decoration: none;">Download PPT</a>
+        </div>
+      </div>
+      <div class="ilove-modal-footer">
+        <button class="btn-ilove-red" onclick="closeModal('teamModal')">Close</button>
       </div>
     </div>
   </div>
