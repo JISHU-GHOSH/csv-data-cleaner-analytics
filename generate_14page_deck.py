@@ -489,64 +489,56 @@ def create_deck():
     p_s7.font.color.rgb = COLOR_DARK_GREEN
 
     members_data = [
-        ("Parth Kothari", "25BCON0044", [
-            "Responsible for core data cleaning pipelines in cleaner.py.",
-            "Engineered regex header standardization and whitespace stripping.",
-            "Formulated rule-based missing value imputation (median/mean/mode)."
+        ("Jishu Ghosh", "25BCON0022", "Software Development & Coding", [
+            "Responsible for the overall development of the CSV Cleaner project.",
+            "Worked on the implementation and integration of the project.",
+            "Handled the overall project functionality, test suite, and cloud hosting."
         ]),
-        ("Hardik Udawat", "25BCON0081", [
-            "Built native desktop graphical interface in main.py using Tkinter.",
-            "Engineered interactive Treeview data spreadsheet with row indexing.",
-            "Integrated Matplotlib statistical charts into GUI and demo pipelines."
+        ("Hardik Udawat", "25BCON0081", "Project Presentation (PPT)", [
+            "Prepared the project presentation.",
+            "Organized and explained the project details and system design.",
+            "Responsible for presenting and delivering the project during viva."
         ]),
-        ("Twisha Srivastava", "25BCON0266", [
-            "Architected and implemented 24-case automated test suite in tests/.",
-            "Developed descriptive statistical summary engine in stats_engine.py.",
-            "Authored project technical documentation and SRS requirements."
+        ("Parth Kothari", "25BCON0044", "Project Report File & Documentation", [
+            "Prepared the project report file.",
+            "Organized project information and documentation.",
+            "Compiled the project details into a structured report."
         ]),
-        ("Jishu Ghosh", "25BCON0022", [
-            "Designed full-stack web architecture and Flask REST API endpoints.",
-            "Developed responsive web application UI with client-side sorting & search.",
-            "Configured Vercel serverless cloud deployment and production hosting."
+        ("Twisha Srivastava", "25BCON0266", "Research Paper & Conceptual Study", [
+            "Worked on researching relevant papers and algorithms.",
+            "Studied related concepts and existing data cleaning systems.",
+            "Collected research references and citations for the project."
         ])
     ]
 
     card_w7 = 5.7
-    for idx, (name, reg, tasks) in enumerate(members_data):
+    for idx, (name, reg, role, tasks) in enumerate(members_data):
         col = idx % 2
         row = idx // 2
         left = 0.8 + col * (card_w7 + 0.333)
-        top = 1.8 + row * 2.6
+        top = 1.8 + row * 2.55
 
-        # Circular Badge on Left of card
-        badge = s7.shapes.add_shape(MSO_SHAPE.OVAL, Inches(left), Inches(top + 0.2), Inches(1.4), Inches(1.4))
-        badge.fill.solid()
-        badge.fill.fore_color.rgb = COLOR_DARK_GREEN
-        badge.line.fill.background()
+        # Clean card container without circular badge
+        add_card(s7, left, top, card_w7, 2.35, COLOR_CREAM_CARD, COLOR_DARK_GREEN)
 
-        # Initials inside badge
-        tb_ini = s7.shapes.add_textbox(Inches(left), Inches(top + 0.5), Inches(1.4), Inches(0.8))
-        tf_ini = tb_ini.text_frame
-        p_ini = tf_ini.paragraphs[0]
-        initials = "".join([part[0] for part in name.split()])
-        p_ini.text = initials
-        p_ini.font.name = FONT_TITLE
-        p_ini.font.size = Pt(20)
-        p_ini.font.bold = True
-        p_ini.font.color.rgb = COLOR_WHITE
-        p_ini.alignment = PP_ALIGN.CENTER
-
-        # Text Details on Right
-        tb = s7.shapes.add_textbox(Inches(left + 1.6), Inches(top), Inches(card_w7 - 1.6), Inches(2.4))
+        tb = s7.shapes.add_textbox(Inches(left + 0.25), Inches(top + 0.15), Inches(card_w7 - 0.5), Inches(2.05))
         tf = tb.text_frame
         tf.word_wrap = True
 
         p1 = tf.paragraphs[0]
-        p1.text = f"{name} ({reg})"
+        p1.text = name
         p1.font.name = FONT_TITLE
-        p1.font.size = Pt(15)
+        p1.font.size = Pt(17)
         p1.font.bold = True
         p1.font.color.rgb = COLOR_DARK_GREEN
+
+        p_sub = tf.add_paragraph()
+        p_sub.text = f"{reg}  •  {role}"
+        p_sub.font.name = FONT_TITLE
+        p_sub.font.size = Pt(11.5)
+        p_sub.font.bold = True
+        p_sub.font.color.rgb = COLOR_CHEVRON_RED
+        p_sub.space_before = Pt(1)
 
         for t in tasks:
             pt = tf.add_paragraph()
@@ -554,7 +546,7 @@ def create_deck():
             pt.font.name = FONT_BODY
             pt.font.size = Pt(10.5)
             pt.font.color.rgb = COLOR_DARK_GREEN
-            pt.space_before = Pt(2)
+            pt.space_before = Pt(3)
 
     # =========================================================
     # SLIDE 8: PROJECT STRUCTURE & PYTHON BACKEND

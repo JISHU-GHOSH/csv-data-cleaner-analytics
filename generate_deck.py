@@ -1041,33 +1041,29 @@ def create_presentation():
     add_slide_header_and_footer(s17, "Team Rocket", "Individual Member Contributions & Ownership", 17)
 
     members_contrib = [
-        ("Jishu Ghosh", "25BCON0022", "Full-Stack Web Architect & Cloud Lead",
+        ("Jishu Ghosh", "25BCON0022", "Software Development & Coding",
          [
-             "Designed overall system architecture and Flask REST API endpoints (/api/*).",
-             "Developed responsive web frontend (HTML/CSS/JS) inspired by iLovePDF aesthetics.",
-             "Implemented client-side keyword search, column sorting, and pagination logic.",
-             "Configured Vercel deployment pipeline (vercel.json, api/index.py) for public cloud access."
+             "Responsible for the overall code development of the CSV Cleaner project.",
+             "Worked on the backend implementation, REST APIs, and cloud integration.",
+             "Engineered the full-stack architecture, test runner, and Vercel hosting."
          ]),
-        ("Parth Kothari", "25BCON0044", "Core Cleaning & Algorithm Engineer",
+        ("Hardik Udawat", "25BCON0081", "Project Presentation (PPT)",
          [
-             "Engineered functional cleaning pipelines in core/cleaner.py.",
-             "Developed regex-based column header standardization and whitespace stripping.",
-             "Implemented rule-based imputation algorithms (mean, median, mode) for missing values.",
-             "Formulated vectorized NumPy logic for Tukey's 1.5x IQR outlier removal."
+             "Prepared the project presentation and visual slide decks.",
+             "Organized and explained the project architecture and features.",
+             "Responsible for presenting and delivering the project during the viva."
          ]),
-        ("Hardik Udawat", "25BCON0081", "Desktop GUI & Visualization Engineer",
+        ("Parth Kothari", "25BCON0044", "Project Report File & Documentation",
          [
-             "Designed and implemented native desktop graphical user interface in main.py (Tkinter).",
-             "Engineered interactive Treeview data spreadsheet with row index numbering.",
-             "Integrated Matplotlib statistical charting engine (histograms, boxplots, bar charts).",
-             "Built user modal dialogs for targeted column dropping and outlier filtering."
+             "Prepared the official project report file and documentation.",
+             "Organized project information, technical specs, and workflows.",
+             "Compiled the complete project details into a structured report."
          ]),
-        ("Twisha Srivastava", "25BCON0266", "Quality Assurance & Documentation Lead",
+        ("Twisha Srivastava", "25BCON0266", "Research Paper & Conceptual Study",
          [
-             "Architected and implemented 24-case automated unit test suite (tests/ & run_tests.py).",
-             "Developed statistical summary profiling engine (core/stats_engine.py).",
-             "Engineered text-based audit logger (core/audit_logger.py) for compliance reports.",
-             "Authored software requirements specification (SRS) and project presentation deck."
+             "Worked on researching relevant papers and data quality algorithms.",
+             "Studied related concepts, outlier formulas, and existing tools.",
+             "Collected research references and academic citations for the project."
          ])
     ]
 
