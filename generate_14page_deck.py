@@ -2,7 +2,7 @@ import os
 import pptx
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
+from pptx.enum.text import PP_ALIGN
 from pptx.enum.shapes import MSO_SHAPE
 
 # -------------------------------------------------------------
@@ -90,11 +90,11 @@ def create_deck():
     p_title.font.color.rgb = COLOR_DARK_GREEN
     p_title.alignment = PP_ALIGN.CENTER
 
-    # Subtitle: SMART CSV DATA CLEANING & ANALYTICS STUDIO
+    # Subtitle: SIMPLE & FAST CSV DATA CLEANER & ANALYTICS
     tb_sub = s1.shapes.add_textbox(Inches(1.0), Inches(2.9), Inches(11.333), Inches(0.6))
     tf_sub = tb_sub.text_frame
     p_sub = tf_sub.paragraphs[0]
-    p_sub.text = "SMART CSV DATA CLEANING & ANALYTICS STUDIO"
+    p_sub.text = "EASY & FAST CSV DATA CLEANER & ANALYTICS STUDIO"
     p_sub.font.name = FONT_TITLE
     p_sub.font.size = Pt(17)
     p_sub.font.bold = True
@@ -136,7 +136,7 @@ def create_deck():
     add_chevrons(s1, "<<<", 12.0, 5.0, 32, COLOR_CHEVRON_RED)
 
     # =========================================================
-    # SLIDE 2: WHAT IS CSV CLEANER?
+    # SLIDE 2: WHAT IS CSV CLEANER? (Easy Language)
     # =========================================================
     s2 = prs.slides.add_slide(blank_layout)
     set_bg(s2, COLOR_DARK_GREEN)
@@ -161,19 +161,19 @@ def create_deck():
     p_w2.font.color.rgb = COLOR_CREAM_BG
     p_w2.space_before = Pt(0)
 
-    # Card 1: Main features (Dark green with cream border)
+    # Card 1: Main features (Easy plain English)
     add_card(s2, 0.8, 2.5, 10.2, 3.2, COLOR_DARK_GREEN, COLOR_CREAM_CARD)
     tb_c1 = s2.shapes.add_textbox(Inches(1.1), Inches(2.7), Inches(9.6), Inches(2.8))
     tf_c1 = tb_c1.text_frame
     tf_c1.word_wrap = True
 
     c1_bullets = [
-        "CSV Cleaner is an automated data sanitization & analytics system.",
-        "It allows users to upload dirty CSV datasets and fix them in 1-click.",
-        "Deduplicates rows, trims spaces, and standardizes column headers.",
-        "Imputes missing values with statistical median, mean, or mode.",
-        "Filters numerical outliers using Tukey's 1.5x IQR formula.",
-        "Features a dual interface: Tkinter Desktop GUI + Flask Cloud Web App."
+        "CSV Cleaner is a simple Python tool to fix messy CSV files in 1 click.",
+        "It removes duplicate rows and trims extra spaces from text automatically.",
+        "It fills empty or missing cells with averages or common values.",
+        "It detects and removes abnormal outlier numbers using a simple formula.",
+        "It shows a live Quality Score (0% to 100%) so you know your data is ready.",
+        "Works offline as a desktop program and online as a website in any browser."
     ]
     for idx, b in enumerate(c1_bullets):
         pb = tf_c1.paragraphs[0] if idx == 0 else tf_c1.add_paragraph()
@@ -188,14 +188,14 @@ def create_deck():
     tb_goal = s2.shapes.add_textbox(Inches(1.1), Inches(6.15), Inches(11.1), Inches(0.7))
     tf_goal = tb_goal.text_frame
     p_goal = tf_goal.paragraphs[0]
-    p_goal.text = "Main Goal: To eliminate the 80% manual data wrangling bottleneck through an automated, reproducible Python platform."
+    p_goal.text = "Main Goal: To make data cleaning fast, simple, and error-free for students and teachers."
     p_goal.font.name = FONT_TITLE
-    p_goal.font.size = Pt(15)
+    p_goal.font.size = Pt(16)
     p_goal.font.bold = True
     p_goal.font.color.rgb = COLOR_DARK_GREEN
 
     # =========================================================
-    # SLIDE 3: PROBLEM >>> OBJECTIVES (Split Screen)
+    # SLIDE 3: PROBLEM >>> OBJECTIVES (Easy Language)
     # =========================================================
     s3 = prs.slides.add_slide(blank_layout)
     set_bg(s3, COLOR_CREAM_BG)
@@ -223,32 +223,32 @@ def create_deck():
     tf_pb.word_wrap = True
 
     p_phead = tf_pb.paragraphs[0]
-    p_phead.text = "Problems in Traditional Data Preparation"
+    p_phead.text = "Problems in Messy CSV Files:"
     p_phead.font.name = FONT_TITLE
-    p_phead.font.size = Pt(14)
+    p_phead.font.size = Pt(15)
     p_phead.font.bold = True
     p_phead.font.color.rgb = COLOR_DARK_GREEN
 
     prob_bullets = [
-        "No standardized column headers; leading spaces break code.",
-        "Redundant duplicate records distort statistics and models.",
-        "Missing values (NaN, empty cells) trigger runtime errors.",
-        "Extreme statistical outliers heavily bias analytical results.",
-        "Spreadsheet editors lack automated, timestamped audit logs.",
-        "Manual cleaning in Excel is tedious, slow, and error-prone."
+        "Column names have spaces and symbols, breaking Python code.",
+        "Repeated rows waste space and give wrong calculation results.",
+        "Missing empty cells cause crashes when running code.",
+        "Extreme wrong numbers (outliers) ruin charts and averages.",
+        "Excel does not save a step-by-step history of changes.",
+        "Cleaning data by hand in Excel takes hours and causes mistakes."
     ]
     for b in prob_bullets:
         pb = tf_pb.add_paragraph()
         pb.text = f"• {b}"
         pb.font.name = FONT_BODY
-        pb.font.size = Pt(11.5)
+        pb.font.size = Pt(12)
         pb.font.color.rgb = COLOR_DARK_GREEN
         pb.space_before = Pt(4)
 
     p_sol = tf_pb.add_paragraph()
-    p_sol.text = "Our Solution: A modular Python application that automates data sanitization, health scoring, and statistical visualization."
+    p_sol.text = "Our Solution: A simple Python program that cleans, fixes, and charts your data automatically in 1 click."
     p_sol.font.name = FONT_TITLE
-    p_sol.font.size = Pt(12)
+    p_sol.font.size = Pt(12.5)
     p_sol.font.bold = True
     p_sol.font.color.rgb = COLOR_DARK_GREEN
     p_sol.space_before = Pt(10)
@@ -268,24 +268,24 @@ def create_deck():
     tf_ob.word_wrap = True
 
     obj_bullets = [
-        "1. Develop a 1-click automated dataset sanitization pipeline.",
-        "2. Standardize column headers to lowercase snake_case.",
-        "3. Detect and drop duplicate rows with zero data corruption.",
-        "4. Provide statistically sound median, mean, and mode imputation.",
-        "5. Filter statistical anomalies using Tukey's 1.5x IQR method.",
-        "6. Compute a real-time composite 0–100% Data Quality Health Score.",
-        "7. Provide dual access: Offline Desktop GUI & Cloud Web App."
+        "1. Clean messy CSV files automatically in 1 click.",
+        "2. Fix column names to clean, lowercase words with no spaces.",
+        "3. Find and remove duplicate rows instantly.",
+        "4. Fill blank cells with averages or common values.",
+        "5. Remove abnormal outlier numbers safely.",
+        "6. Show a live 0% to 100% Data Quality Score.",
+        "7. Provide both a Desktop App and a Website."
     ]
     for idx, b in enumerate(obj_bullets):
         pb = tf_ob.paragraphs[0] if idx == 0 else tf_ob.add_paragraph()
         pb.text = b
         pb.font.name = FONT_BODY
-        pb.font.size = Pt(12)
+        pb.font.size = Pt(12.5)
         pb.font.color.rgb = COLOR_WHITE
         pb.space_before = Pt(6)
 
     # =========================================================
-    # SLIDE 4: SYSTEM DESIGN
+    # SLIDE 4: SYSTEM DESIGN (Easy Language)
     # =========================================================
     s4 = prs.slides.add_slide(blank_layout)
     set_bg(s4, COLOR_DARK_GREEN)
@@ -302,25 +302,25 @@ def create_deck():
 
     layers_s4 = [
         ("Presentation\nlayer:", [
-            "Tkinter Desktop GUI",
-            "HTML5 & CSS3 Web UI",
-            "Responsive iLovePDF Theme",
-            "Interactive Chart.js Canvas",
-            "Interactive Treeview Spreadsheet"
+            "Tkinter Desktop Window",
+            "HTML5 and CSS3 Web UI",
+            "Clean and easy layout",
+            "Interactive data spreadsheet",
+            "Live visual charts"
         ]),
         ("Application\nlayer", [
-            "Python 3.13 Core",
-            "Flask REST API Services",
-            "Cleaner Transformation Engine",
-            "State Manager (LIFO Undo Stack)",
-            "Tukey 1.5x IQR Outlier Logic"
+            "Python 3.13 code",
+            "Data cleaning functions",
+            "Undo button to revert mistakes",
+            "Outlier detection logic",
+            "Flask web server routes"
         ]),
-        ("Data / Analytics\nlayer", [
-            "Pandas Tabular DataFrames",
-            "NumPy Vectorized Arrays",
-            "Matplotlib Statistical Figures",
-            "In-memory BytesIO Streaming",
-            "CSV, JSON & Text Exporters"
+        ("Data & Export\nlayer", [
+            "Pandas for handling tables",
+            "NumPy for fast math",
+            "Matplotlib for plotting charts",
+            "Download as cleaned CSV",
+            "Download as JSON or Text report"
         ])
     ]
 
@@ -348,7 +348,7 @@ def create_deck():
             pit.space_before = Pt(8)
 
     # =========================================================
-    # SLIDE 5: METHODOLOGY
+    # SLIDE 5: METHODOLOGY (Easy Language)
     # =========================================================
     s5 = prs.slides.add_slide(blank_layout)
     set_bg(s5, COLOR_CREAM_BG)
@@ -364,35 +364,35 @@ def create_deck():
     p_s5.font.color.rgb = COLOR_DARK_GREEN
 
     meth_steps = [
-        ("Requirement analysis", [
-            "Identify common spreadsheet flaws.",
-            "Understand student and ML researcher needs.",
-            "Finalize the core cleaning features."
+        ("Requirement study", [
+            "Find common mistakes in student CSV files.",
+            "List the most needed cleaning features.",
+            "Decide on simple 1-click button controls."
         ]),
-        ("System & state design", [
-            "Design modular 4-tier application architecture.",
-            "Formulate LIFO undo snapshot stack.",
-            "Prepare user workflows and REST endpoints."
+        ("System design", [
+            "Plan desktop GUI and website screens.",
+            "Design an undo feature to fix mistakes.",
+            "Create routes to connect web pages with Python."
         ]),
-        ("Core algorithm development", [
-            "Implement regex header normalization.",
-            "Build median, mean, and mode imputation.",
-            "Formulate Tukey 1.5x IQR outlier bounds."
+        ("Writing cleaning code", [
+            "Write code to fix messy column names.",
+            "Write code to delete duplicate rows.",
+            "Write code to fill blank numbers and words."
         ]),
-        ("Health & metrics engine", [
-            "Formulate composite 0–100% Quality Score.",
-            "Assemble 5-number statistical summaries.",
-            "Build timestamped audit logging system."
+        ("Quality score & math", [
+            "Create the 0% to 100% Quality Score.",
+            "Calculate mean, median, min, and max.",
+            "Build an automatic text audit report."
         ]),
-        ("Dual frontend development", [
-            "Build offline desktop GUI using Tkinter.",
-            "Design responsive web layouts using CSS3.",
-            "Implement client-side sorting & pagination."
+        ("Building user interfaces", [
+            "Build the desktop window with Tkinter.",
+            "Design clean web pages with CSS.",
+            "Add live search, sorting, and page numbers."
         ]),
-        ("Integration & testing", [
-            "Connect web frontend with Flask backend.",
-            "Execute 24-case automated unit test suite.",
-            "Deploy live to Vercel serverless cloud."
+        ("Testing & live deployment", [
+            "Run 24 automated tests to check all features.",
+            "Fix any errors or warnings.",
+            "Deploy the website live on Vercel."
         ])
     ]
 
@@ -418,12 +418,12 @@ def create_deck():
             ppt = tf.add_paragraph()
             ppt.text = f"    • {pt}"
             ppt.font.name = FONT_BODY
-            ppt.font.size = Pt(11)
+            ppt.font.size = Pt(11.5)
             ppt.font.color.rgb = COLOR_DARK_GREEN
             ppt.space_before = Pt(2)
 
     # =========================================================
-    # SLIDE 6: TOOLS & TECHNOLOGIES
+    # SLIDE 6: TOOLS & TECHNOLOGIES (Easy Language)
     # =========================================================
     s6 = prs.slides.add_slide(blank_layout)
     set_bg(s6, COLOR_DARK_GREEN)
@@ -438,21 +438,20 @@ def create_deck():
     p_s6.font.color.rgb = COLOR_CREAM_BG
 
     card_tools = [
-        ("Core Stack", [
-            ("Python 3.13", "Main programming language and runtime environment."),
-            ("Pandas", "Tabular DataFrame manipulation, deduplication, and grouping."),
-            ("NumPy", "Vectorized array calculations and IQR percentile thresholding."),
-            ("Matplotlib", "Statistical figures: histograms, boxplots, and bar charts."),
-            ("Tkinter", "Standard desktop graphical user interface with Treeview."),
-            ("Flask", "Lightweight WSGI microservice framework for REST APIs.")
+        ("Core Python Libraries", [
+            ("Python 3.13", "Main programming language used to build the project."),
+            ("Pandas", "Used for loading, editing, and saving CSV tables."),
+            ("NumPy", "Used for fast math and finding outlier numbers."),
+            ("Matplotlib", "Used to create histograms, boxplots, and bar charts."),
+            ("Tkinter", "Used to build the offline desktop program window."),
+            ("Flask", "Used to run the web server and handle web buttons.")
         ]),
-        ("Ecosystem & Libraries", [
-            ("Chart.js", "Client-side interactive canvas charting in the browser."),
-            ("unittest", "Automated test suite covering 24 comprehensive test cases."),
-            ("io & os", "In-memory file stream management (BytesIO, StringIO)."),
-            ("json", "Structured JSON serialization for records export."),
-            ("Vercel", "Serverless cloud infrastructure and global edge deployment."),
-            ("Git & GitHub", "Source version control and automated deployment pipeline.")
+        ("Web & Testing Tools", [
+            ("HTML5 & CSS3", "Used to structure and style the website cleanly."),
+            ("Chart.js", "Used to display interactive charts in the web browser."),
+            ("unittest", "Used to test all 24 features automatically."),
+            ("Vercel", "Used to host the website live on the internet."),
+            ("GitHub", "Used to store, backup, and manage our project code.")
         ])
     ]
 
@@ -466,14 +465,14 @@ def create_deck():
 
         for i, (tool, desc) in enumerate(items):
             pt = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
-            pt.text = f"• {tool} – {desc}"
+            pt.text = f"• {tool}: {desc}"
             pt.font.name = FONT_BODY
-            pt.font.size = Pt(12)
+            pt.font.size = Pt(13)
             pt.font.color.rgb = COLOR_DARK_GREEN
-            pt.space_before = Pt(6)
+            pt.space_before = Pt(8)
 
     # =========================================================
-    # SLIDE 7: ROLES & RESPONSIBILITIES
+    # SLIDE 7: ROLES & RESPONSIBILITIES (Easy Language & No Circles)
     # =========================================================
     s7 = prs.slides.add_slide(blank_layout)
     set_bg(s7, COLOR_CREAM_BG)
@@ -489,25 +488,25 @@ def create_deck():
     p_s7.font.color.rgb = COLOR_DARK_GREEN
 
     members_data = [
-        ("Jishu Ghosh", "25BCON0022", "Software Development & Coding", [
-            "Responsible for the overall development of the CSV Cleaner project.",
-            "Worked on the implementation and integration of the project.",
-            "Handled the overall project functionality, test suite, and cloud hosting."
+        ("Jishu Ghosh", "25BCON0022", "Code & Development", [
+            "Responsible for the overall code development of the project.",
+            "Wrote the Python backend, cleaning functions, and web routes.",
+            "Handled project testing, bug fixes, and live cloud deployment."
         ]),
         ("Hardik Udawat", "25BCON0081", "Project Presentation (PPT)", [
-            "Prepared the project presentation.",
-            "Organized and explained the project details and system design.",
-            "Responsible for presenting and delivering the project during viva."
+            "Prepared and designed the complete project presentation (PPT).",
+            "Organized and explained the project features and design clearly.",
+            "Responsible for presenting and delivering the project during the viva."
         ]),
-        ("Parth Kothari", "25BCON0044", "Project Report File & Documentation", [
-            "Prepared the project report file.",
-            "Organized project information and documentation.",
-            "Compiled the project details into a structured report."
+        ("Parth Kothari", "25BCON0044", "Project Report File", [
+            "Prepared the official project report file and documentation.",
+            "Organized project information, steps, and features into one file.",
+            "Compiled all project details into a neat, structured report."
         ]),
-        ("Twisha Srivastava", "25BCON0266", "Research Paper & Conceptual Study", [
-            "Worked on researching relevant papers and algorithms.",
-            "Studied related concepts and existing data cleaning systems.",
-            "Collected research references and citations for the project."
+        ("Twisha Srivastava", "25BCON0266", "Research Paper & Study", [
+            "Researched related papers and data cleaning methods.",
+            "Studied how missing values and outliers are handled in data science.",
+            "Collected all research references and study links for the project."
         ])
     ]
 
@@ -535,7 +534,7 @@ def create_deck():
         p_sub = tf.add_paragraph()
         p_sub.text = f"{reg}  •  {role}"
         p_sub.font.name = FONT_TITLE
-        p_sub.font.size = Pt(11.5)
+        p_sub.font.size = Pt(12)
         p_sub.font.bold = True
         p_sub.font.color.rgb = COLOR_CHEVRON_RED
         p_sub.space_before = Pt(1)
@@ -544,12 +543,12 @@ def create_deck():
             pt = tf.add_paragraph()
             pt.text = f"• {t}"
             pt.font.name = FONT_BODY
-            pt.font.size = Pt(10.5)
+            pt.font.size = Pt(11)
             pt.font.color.rgb = COLOR_DARK_GREEN
             pt.space_before = Pt(3)
 
     # =========================================================
-    # SLIDE 8: PROJECT STRUCTURE & PYTHON BACKEND
+    # SLIDE 8: PROJECT STRUCTURE & PYTHON BACKEND (Easy Language)
     # =========================================================
     s8 = prs.slides.add_slide(blank_layout)
     set_bg(s8, COLOR_DARK_GREEN)
@@ -571,7 +570,7 @@ def create_deck():
     tf_tree.word_wrap = True
 
     p_th = tf_tree.paragraphs[0]
-    p_th.text = "Project Architecture Tree"
+    p_th.text = "Project Folders & Files"
     p_th.font.name = FONT_TITLE
     p_th.font.size = Pt(14)
     p_th.font.bold = True
@@ -579,19 +578,19 @@ def create_deck():
 
     tree_lines = [
         "csv-cleaner-analytics/",
-        "├── app.py                (Flask backend & API)",
-        "├── main.py               (Tkinter desktop GUI)",
-        "├── run_tests.py          (Automated test runner)",
+        "├── app.py                (Web server & API)",
+        "├── main.py               (Desktop program GUI)",
+        "├── run_tests.py          (Runs all 24 tests)",
         "├── core/",
-        "│   ├── cleaner.py        (Cleaning algorithms)",
-        "│   ├── data_manager.py   (State & undo stack)",
-        "│   ├── stats_engine.py   (Summary statistics)",
-        "│   ├── exporter.py       (CSV, JSON, TXT)",
-        "│   └── audit_logger.py   (Action logging)",
+        "│   ├── cleaner.py        (Cleaning functions)",
+        "│   ├── data_manager.py   (Undo stack & quality)",
+        "│   ├── stats_engine.py   (Calculates statistics)",
+        "│   ├── exporter.py       (Saves CSV, JSON, TXT)",
+        "│   └── audit_logger.py   (Logs all changes)",
         "├── static/               (style.css, app.js)",
         "├── templates/            (index.html)",
-        "├── tests/                (24 unit test cases)",
-        "└── vercel.json           (Cloud configuration)"
+        "├── tests/                (24 automated tests)",
+        "└── vercel.json           (Website hosting setup)"
     ]
     for tl in tree_lines:
         ptl = tf_tree.add_paragraph()
@@ -601,7 +600,7 @@ def create_deck():
         ptl.font.color.rgb = COLOR_WHITE
         ptl.space_before = Pt(1)
 
-    # Right column: Concepts
+    # Right column: Concepts (Easy language)
     tb_c = s8.shapes.add_textbox(Inches(6.4), Inches(1.8), Inches(6.0), Inches(5.0))
     tf_c = tb_c.text_frame
     tf_c.word_wrap = True
@@ -614,25 +613,25 @@ def create_deck():
     p_ch.font.color.rgb = COLOR_CREAM_BG
 
     concepts = [
-        "Object-Oriented Programming (Classes & DataManager encapsulation).",
-        "Vectorized array processing with NumPy (zero loop overhead).",
-        "Tabular indexing, filtering & grouping with Pandas.",
-        "LIFO Stack data structures for Multi-Level Undo operations.",
-        "In-memory stream buffers (io.StringIO, io.BytesIO).",
-        "Decorators and REST routing in Flask (@app.route).",
-        "Automated unit testing with Python unittest.TestCase.",
-        "Defensive exception handling (try / except) across all file I/O."
+        "Variables and basic data types (strings, numbers, booleans).",
+        "Functions and modular code to keep everything organized.",
+        "Conditional statements (if, else) to make decisions.",
+        "Loops (for, while) to process data.",
+        "Lists and Dictionaries to store and organize records.",
+        "Object-Oriented Programming (Classes) for state management.",
+        "Error handling (try, except) so the program never crashes.",
+        "File reading and writing for CSV files."
     ]
     for c in concepts:
         pc = tf_c.add_paragraph()
         pc.text = f"• {c}"
         pc.font.name = FONT_BODY
-        pc.font.size = Pt(12)
+        pc.font.size = Pt(13)
         pc.font.color.rgb = COLOR_WHITE
-        pc.space_before = Pt(5)
+        pc.space_before = Pt(6)
 
     # =========================================================
-    # SLIDE 9: DATA CLEANING, STATE & QUALITY SCORING
+    # SLIDE 9: DATA CLEANING, STATE & QUALITY SCORING (Easy Language)
     # =========================================================
     s9 = prs.slides.add_slide(blank_layout)
     set_bg(s9, COLOR_CREAM_BG)
@@ -648,27 +647,27 @@ def create_deck():
     p_s9.font.color.rgb = COLOR_DARK_GREEN
 
     sec_s9 = [
-        ("Data Cleaning Pipeline", [
-            "Converts all headers to standardized lowercase snake_case.",
-            "Strips extraneous spaces across all text/object columns.",
-            "Detects duplicate rows and drops them while logging exact counts.",
-            "Imputes missing numerical values with Median (skewed) or Mean (symmetric).",
-            "Imputes categorical text columns with Mode (most frequent category).",
-            "Filters statistical outliers using Tukey's 1.5x IQR boundaries."
+        ("1. Data Cleaning", [
+            "Fixes column names to clean, lowercase words with underscores.",
+            "Deletes repeated duplicate rows automatically.",
+            "Trims invisible spaces from text cells.",
+            "Fills blank numbers with the median or mean.",
+            "Fills blank text cells with the most common word.",
+            "Removes extreme outlier numbers safely."
         ]),
-        ("State Management & Undo Stack", [
-            "Implements snapshot Memento design pattern with in-memory LIFO stack.",
-            "Uses deepcopy isolation so prior states remain completely untampered.",
-            "Maintains a bounded stack of 15 states to protect RAM from exhaustion.",
-            "Allows users to hit 'Undo' to revert operations instantly.",
-            "Provides 'Reset' to restore pristine raw dataset from disk anytime."
+        ("2. Undo & Reset Feature", [
+            "Saves a copy of your data before every single change.",
+            "Made a mistake? Just click 'Undo' to get your data back.",
+            "Supports up to 15 undo steps in memory.",
+            "Click 'Reset' anytime to restore your original file.",
+            "Ensures you never lose your original data."
         ]),
-        ("0–100% Quality Scoring Engine", [
-            "Completeness (50% weight): 1.0 - (Missing Cells / Total Grid Cells).",
-            "Uniqueness (30% weight): 1.0 - (Duplicate Rows / Total Rows).",
-            "Header Hygiene (20% weight): 1.0 if clean snake_case, else 0.80.",
-            "Dynamic color progress bar: Red (<60%), Amber (60–84%), Green (≥85%).",
-            "Gives users instant quantitative feedback before exporting data."
+        ("3. Quality Score (0%–100%)", [
+            "Shows an instant health percentage for your dataset.",
+            "Checks 3 things: missing cells, duplicate rows, and column names.",
+            "Red bar (<60%): Needs cleaning.",
+            "Amber bar (60%–84%): Almost ready.",
+            "Green bar (85%+): 100% clean and ready to export!"
         ])
     ]
 
@@ -683,7 +682,7 @@ def create_deck():
         p1 = tf.paragraphs[0]
         p1.text = title
         p1.font.name = FONT_TITLE
-        p1.font.size = Pt(14)
+        p1.font.size = Pt(15)
         p1.font.bold = True
         p1.font.color.rgb = COLOR_DARK_GREEN
 
@@ -691,12 +690,12 @@ def create_deck():
             ppt = tf.add_paragraph()
             ppt.text = f"• {pt}"
             ppt.font.name = FONT_BODY
-            ppt.font.size = Pt(10.5)
+            ppt.font.size = Pt(11)
             ppt.font.color.rgb = COLOR_DARK_GREEN
-            ppt.space_before = Pt(4)
+            ppt.space_before = Pt(5)
 
     # =========================================================
-    # SLIDE 10: RESULTS (Visual Showcase)
+    # SLIDE 10: RESULTS (Easy Language)
     # =========================================================
     s10 = prs.slides.add_slide(blank_layout)
     set_bg(s10, COLOR_DARK_GREEN)
@@ -714,11 +713,11 @@ def create_deck():
     if os.path.exists(CHART_IMG_PATH):
         s10.shapes.add_picture(CHART_IMG_PATH, Inches(0.8), Inches(1.7), width=Inches(11.733), height=Inches(3.3))
 
-    # Three summary result cards underneath
+    # Three summary result cards underneath (Easy language)
     res_cards = [
-        ("Cloud Web Application", "Deployed live on Vercel at csv-data-cleaner-analytics.vercel.app with iLovePDF-inspired theme, real-time search, sorting, and pagination."),
-        ("Desktop GUI Application", "Fully functional native Tkinter desktop interface with Treeview spreadsheet view, file dialogs, and embedded Matplotlib visualizer."),
-        ("Automated Quality Audit", "Generates downloadable cleaning_audit_report.txt documenting every applied transformation, dropped rows, and imputed values.")
+        ("Live Website", "Website is live on Vercel at csv-data-cleaner-analytics.vercel.app with simple 1-click tools, search, and charts."),
+        ("Desktop Program", "Offline desktop application with a table view, buttons to clean data, and graphs that run without internet."),
+        ("Audit Text Report", "Downloads a complete text summary showing every single change made to the dataset.")
     ]
     card_w10 = 3.65
     for idx, (title, desc) in enumerate(res_cards):
@@ -731,19 +730,19 @@ def create_deck():
         p1 = tf.paragraphs[0]
         p1.text = title
         p1.font.name = FONT_TITLE
-        p1.font.size = Pt(13)
+        p1.font.size = Pt(14)
         p1.font.bold = True
         p1.font.color.rgb = COLOR_DARK_GREEN
 
         p2 = tf.add_paragraph()
         p2.text = desc
         p2.font.name = FONT_BODY
-        p2.font.size = Pt(10)
+        p2.font.size = Pt(10.5)
         p2.font.color.rgb = COLOR_DARK_GREEN
         p2.space_before = Pt(3)
 
     # =========================================================
-    # SLIDE 11: TESTING (Table & Verification)
+    # SLIDE 11: TESTING (Easy Language)
     # =========================================================
     s11 = prs.slides.add_slide(blank_layout)
     set_bg(s11, COLOR_DARK_GREEN)
@@ -758,20 +757,18 @@ def create_deck():
     p_s11.font.bold = True
     p_s11.font.color.rgb = COLOR_CREAM_BG
 
-    # Testing Table Card (Left & Right Cards)
+    # Testing Table Card (Easy language)
     test_cases_left = [
-        ("Standardize headers", "Standardized lowercase snake_case headers"),
-        ("Duplicate row detection", "Redundant rows identified & removed"),
-        ("Median numeric imputation", "Missing age/marks filled with median"),
-        ("Mode categorical imputation", "Missing department filled with mode"),
-        ("IQR outlier removal", "Extreme anomalies outside whiskers removed")
+        ("Fix column names", "Headers changed to clean, lowercase words"),
+        ("Remove duplicate rows", "Repeated rows found and deleted safely"),
+        ("Fill missing numbers", "Blank number cells filled with median value"),
+        ("Fill missing text", "Blank text cells filled with most common word")
     ]
     test_cases_right = [
-        ("Multi-level undo operation", "Prior DataFrame state safely restored"),
-        ("Data Quality Score formula", "0–100% composite index accurately computed"),
-        ("Invalid file upload", "Graceful error message returned (zero crash)"),
-        ("Export to JSON records", "Valid JSON stream generated and downloaded"),
-        ("Export to CSV format", "Standard RFC-4180 CSV generated and downloaded")
+        ("Remove outlier numbers", "Abnormal high/low values removed safely"),
+        ("Undo button test", "Previous data restored successfully"),
+        ("Quality score test", "Score calculated accurately from 0 to 100%"),
+        ("Bad file test", "Wrong files handled safely with zero crashes")
     ]
 
     add_card(s11, 1.0, 1.8, 5.4, 4.3, COLOR_CREAM_BG, None)
@@ -782,7 +779,7 @@ def create_deck():
     p_thl = tf_tl.paragraphs[0]
     p_thl.text = "Test Case                        Expected Result"
     p_thl.font.name = FONT_TITLE
-    p_thl.font.size = Pt(13)
+    p_thl.font.size = Pt(14)
     p_thl.font.bold = True
     p_thl.font.color.rgb = COLOR_DARK_GREEN
 
@@ -790,9 +787,9 @@ def create_deck():
         p = tf_tl.add_paragraph()
         p.text = f"✔ {tc}\n   ➔ {er}"
         p.font.name = FONT_BODY
-        p.font.size = Pt(10.5)
+        p.font.size = Pt(11.5)
         p.font.color.rgb = COLOR_DARK_GREEN
-        p.space_before = Pt(4)
+        p.space_before = Pt(6)
 
     add_card(s11, 6.9, 1.8, 5.4, 4.3, COLOR_CREAM_BG, None)
     tb_tr = s11.shapes.add_textbox(Inches(7.1), Inches(1.95), Inches(5.0), Inches(4.0))
@@ -802,7 +799,7 @@ def create_deck():
     p_thr = tf_tr.paragraphs[0]
     p_thr.text = "Test Case                        Expected Result"
     p_thr.font.name = FONT_TITLE
-    p_thr.font.size = Pt(13)
+    p_thr.font.size = Pt(14)
     p_thr.font.bold = True
     p_thr.font.color.rgb = COLOR_DARK_GREEN
 
@@ -810,24 +807,24 @@ def create_deck():
         p = tf_tr.add_paragraph()
         p.text = f"✔ {tc}\n   ➔ {er}"
         p.font.name = FONT_BODY
-        p.font.size = Pt(10.5)
+        p.font.size = Pt(11.5)
         p.font.color.rgb = COLOR_DARK_GREEN
-        p.space_before = Pt(4)
+        p.space_before = Pt(6)
 
     # Bottom summary pill
     add_card(s11, 1.0, 6.3, 11.3, 0.7, COLOR_CREAM_CARD, None)
     tb_ts = s11.shapes.add_textbox(Inches(1.2), Inches(6.38), Inches(10.9), Inches(0.5))
     tf_ts = tb_ts.text_frame
     p_ts = tf_ts.paragraphs[0]
-    p_ts.text = "All 24 automated unit tests passed with 0 errors in 0.066s execution time via 'python run_tests.py'."
+    p_ts.text = "All 24 automated unit tests passed successfully with 0 errors in 0.06 seconds!"
     p_ts.font.name = FONT_TITLE
-    p_ts.font.size = Pt(12)
+    p_ts.font.size = Pt(13)
     p_ts.font.bold = True
     p_ts.font.color.rgb = COLOR_DARK_GREEN
     p_ts.alignment = PP_ALIGN.CENTER
 
     # =========================================================
-    # SLIDE 12: CONCLUSION
+    # SLIDE 12: CONCLUSION (Easy Language)
     # =========================================================
     s12 = prs.slides.add_slide(blank_layout)
     set_bg(s12, COLOR_DARK_GREEN)
@@ -849,11 +846,11 @@ def create_deck():
     tf_cb.word_wrap = True
 
     concl_points = [
-        "CSVCleaner provides a centralized, automated digital platform for dataset sanitization and statistical analytics.",
-        "The project demonstrates the practical application of Python programming, Pandas data wrangling, NumPy vectorized math, and Matplotlib figure plotting.",
-        "It successfully eliminates the 80% data wrangling bottleneck by transforming messy raw files into clean, analysis-ready datasets in milliseconds.",
-        "Introduced an innovative 0–100% Data Quality Metric that delivers instant quantitative visibility into dataset hygiene.",
-        "Verified with 24 automated unit tests and deployed live to Vercel cloud infrastructure for public academic evaluation."
+        "CSV Cleaner provides an easy, automated tool to clean and analyze messy datasets.",
+        "The project demonstrates practical Python skills: Pandas, NumPy, Matplotlib, and web building.",
+        "It saves hours of manual work by fixing messy spreadsheets in just one click.",
+        "The live Quality Score gives instant confidence that data is clean and ready to use.",
+        "Fully tested with 24 passing unit tests and running live on both Desktop and Web."
     ]
     for idx, cp in enumerate(concl_points):
         p = tf_cb.paragraphs[0] if idx == 0 else tf_cb.add_paragraph()
@@ -864,7 +861,7 @@ def create_deck():
         p.space_before = Pt(14)
 
     # =========================================================
-    # SLIDE 13: REFERENCES
+    # SLIDE 13: REFERENCES (Easy Language)
     # =========================================================
     s13 = prs.slides.add_slide(blank_layout)
     set_bg(s13, COLOR_CREAM_BG)
@@ -885,20 +882,19 @@ def create_deck():
     tf_rb.word_wrap = True
 
     ref_items = [
-        ("Python Software Foundation", "Python 3.13 Documentation.", "https://docs.python.org/3/"),
-        ("Pandas Development Team", "pandas: Powerful Python Data Analysis Toolkit.", "https://pandas.pydata.org/"),
-        ("NumPy Developers", "NumPy: Fundamental Package for Scientific Computing with Python.", "https://numpy.org/"),
-        ("Matplotlib Development Team", "Matplotlib: Visualization with Python.", "https://matplotlib.org/"),
-        ("Pallets Projects", "Flask Documentation (Web Development with Python).", "https://flask.palletsprojects.com/"),
-        ("John W. Tukey", "Exploratory Data Analysis (Tukey IQR Outlier Standard).", "Addison-Wesley, 1977.")
+        ("Python Software Foundation", "Python 3.13 Official Documentation.", "https://docs.python.org/3/"),
+        ("Pandas Development Team", "pandas: Python Data Analysis Library.", "https://pandas.pydata.org/"),
+        ("NumPy Developers", "NumPy: Scientific Computing in Python.", "https://numpy.org/"),
+        ("Matplotlib Development Team", "Matplotlib: Data Visualization with Python.", "https://matplotlib.org/"),
+        ("Pallets Projects", "Flask: Web Development in Python.", "https://flask.palletsprojects.com/")
     ]
     for idx, (org, title, url) in enumerate(ref_items):
         p = tf_rb.paragraphs[0] if idx == 0 else tf_rb.add_paragraph()
         p.text = f"• {org}, {title} {url}"
         p.font.name = FONT_BODY
-        p.font.size = Pt(14.5)
+        p.font.size = Pt(15)
         p.font.color.rgb = COLOR_DARK_GREEN
-        p.space_before = Pt(12)
+        p.space_before = Pt(14)
 
     # =========================================================
     # SLIDE 14: THANK YOU
@@ -947,10 +943,10 @@ def create_deck():
     p_rp.space_before = Pt(4)
 
     mems_14 = [
-        "Parth Kothari (25BCON0044)",
+        "Jishu Ghosh (25BCON0022)",
         "Hardik Udawat (25BCON0081)",
-        "Twisha Srivastava (25BCON0266)",
-        "Jishu Ghosh (25BCON0022)"
+        "Parth Kothari (25BCON0044)",
+        "Twisha Srivastava (25BCON0266)"
     ]
     for m in mems_14:
         pm = tf_ri.add_paragraph()
@@ -961,9 +957,9 @@ def create_deck():
         pm.space_before = Pt(4)
 
     p_rlive = tf_ri.add_paragraph()
-    p_rlive.text = "Live Deployment: https://csv-data-cleaner-analytics.vercel.app\nGitHub: https://github.com/JISHU-GHOSH/csv-data-cleaner-analytics"
+    p_rlive.text = "Live Website: https://csv-data-cleaner-analytics.vercel.app\nGitHub Code: https://github.com/JISHU-GHOSH/csv-data-cleaner-analytics"
     p_rlive.font.name = FONT_TITLE
-    p_rlive.font.size = Pt(11.5)
+    p_rlive.font.size = Pt(12)
     p_rlive.font.bold = True
     p_rlive.font.color.rgb = COLOR_DARK_GREEN
     p_rlive.space_before = Pt(12)
@@ -971,7 +967,7 @@ def create_deck():
     # Save presentation
     output_filename = "CSV_Cleaner_14_Pages_Presentation.pptx"
     prs.save(output_filename)
-    print(f"14-page presentation saved successfully to: {os.path.abspath(output_filename)}")
+    print(f"14-page presentation saved successfully with easy language to: {os.path.abspath(output_filename)}")
 
 if __name__ == "__main__":
     create_deck()
